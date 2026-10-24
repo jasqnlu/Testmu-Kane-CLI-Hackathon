@@ -1,0 +1,19 @@
+{
+  "commit_id": "8288cb81-4869-4752-8141-0e2f6fd5bcfb",
+  "test_id": "14f41e6c-8d53-452c-aeef-92707aa6dd53",
+  "testcase_id": "01M5QS26QRPW3J3DPMQG9TSM4N",
+  "project_id": "01M5P8CE37CJWXR7V5N86YABJR",
+  "folder_id": "01M5P8CEMKND2NRKAJ5DF3PR9Q",
+  "org_id": "3387873",
+  "session_name": "show-failure-and-restore-credits-after-failed-activation",
+  "executions": [
+    {
+      "execution_id": "f9607273-159b-48b0-a7df-4755abbb9065",
+      "run_kind": "author",
+      "status": "passed",
+      "valid": true,
+      "uploaded": true,
+      "at": "2026-10-24T20:55:37.487Z"
+    }
+  ]
+}

@@ -187,7 +187,19 @@ final class AppStore: ObservableObject {
                 try await screenTime.activateExtension(minutes: quote.minutes)
             } catch {
                 guard generation == sessionGeneration else { return }
-                extensionError = userMessage(error, fallback: "Your group time was approved, but this device couldn't apply it.")
+                if let extensionID = updated.activeExtension?.id {
+                    do {
+                        let reconciled = try await backend.releaseReservation(signedIn, extensionID: extensionID)
+                        guard generation == sessionGeneration else { return }
+                        group = reconciled
+                    } catch {
+                        guard generation == sessionGeneration else { return }
+                        if let refreshed = try? await backend.groupSnapshot(signedIn) {
+                            group = refreshed
+                        }
+                    }
+                }
+                extensionError = "Couldn't start extension"
             }
         } catch {
             guard generation == sessionGeneration else { return }

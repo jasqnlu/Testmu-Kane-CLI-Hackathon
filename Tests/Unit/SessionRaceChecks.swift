@@ -67,6 +67,9 @@ private actor ControlledBackend: BackendServing {
     func confirmExtension(_ session: AuthSession, minutes: Int) async throws -> GroupSnapshot {
         Self.group(session.accessToken.contains("bob") ? "Bob" : "Alice")
     }
+    func releaseReservation(_ session: AuthSession, extensionID: UUID) async throws -> GroupSnapshot {
+        Self.group(session.accessToken.contains("bob") ? "Bob" : "Alice")
+    }
     #if DEBUG
     func resetNormal(_ session: AuthSession) async throws -> GroupSnapshot { try await groupSnapshot(session) }
     func seedLowBalance(_ session: AuthSession) async throws -> GroupSnapshot { try await groupSnapshot(session) }

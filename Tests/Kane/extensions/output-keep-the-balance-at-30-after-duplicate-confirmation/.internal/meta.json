@@ -1,0 +1,26 @@
+{
+  "commit_id": "e08d6663-8ac0-4097-b322-20cca1c57d89",
+  "test_id": "5c710a71-1b70-4d6a-a3f6-4668a6330656",
+  "testcase_id": "01M5QRK1JT1TGSJT1VBHCJ1GNV",
+  "project_id": "01M5P8CE37CJWXR7V5N86YABJR",
+  "folder_id": "01M5P8CEMKND2NRKAJ5DF3PR9Q",
+  "org_id": "3387873",
+  "session_name": "keep-the-balance-at-30-after-duplicate-confirmation",
+  "executions": [
+    {
+      "execution_id": "a3096d85-e9de-400f-98e1-0fd6c84c2a2f",
+      "run_kind": "author",
+      "status": "passed",
+      "valid": true,
+      "at": "2026-10-24T20:27:16.338Z"
+    },
+    {
+      "execution_id": "f9607273-159b-48b0-a7df-4755abbb9065",
+      "run_kind": "replay",
+      "status": "passed",
+      "valid": true,
+      "uploaded": true,
+      "at": "2026-10-24T20:55:37.486Z"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Weave evidence index
 
-**Submission status: not ready.** M1 auth/group, M2 extension flows, and the existing M3 double-tap behavior have validated Kane evidence; RECOV-01 has a pre-guard red awaiting its fix and green rerun. The M2 pre-guard CREDIT-02 red is missing because the server guard was already present in the starting worktree. Remaining product flows and submission gates are open. Empty cells below mean unverified, not passing.
+**Submission status: not ready.** M1 auth/group and M2 extension flows have validated Kane evidence. M3 RECOV-01 has a validated pre-guard red and green rerun; the four-test extension regression suite passed. CREDIT-01 SQL concurrency verification remains pending. The M2 pre-guard CREDIT-02 red is missing because the server guard was already present in the starting worktree. Remaining product flows and submission gates are open. Empty cells below mean unverified, not passing.
 
 | Requirement | Test file | Red pack | Green pack | What Kane caught |
 | --- | --- | --- | --- | --- |
@@ -11,13 +11,15 @@
 | EXT-01 | [cancel-and-dismiss-without-activating-or-spending_test.md](../Tests/Kane/extensions/cancel-and-dismiss-without-activating-or-spending_test.md) | — | [M2_extensions_green_20261024.evidence](packs/M2_extensions_green_20261024.evidence) | Kane confirmed cancelling or dismissing the confirmation sheet leaves the 40-credit balance untouched. |
 | EXT-02 | [confirm-cost-then-activate-ten-minutes-at-thirty-credits_test.md](../Tests/Kane/extensions/confirm-cost-then-activate-ten-minutes-at-thirty-credits_test.md) | — | [M2_extensions_green_20261024.evidence](packs/M2_extensions_green_20261024.evidence) | Kane confirmed an explicit 10-credit confirmation leaves 30 credits and shows an active extension with an expiry. |
 | EXT-03 | [keep-the-balance-at-30-after-duplicate-confirmation_test.md](../Tests/Kane/extensions/keep-the-balance-at-30-after-duplicate-confirmation_test.md) | — | [EXT-03_preexisting_ui_guard_green_20261024.evidence](packs/EXT-03_preexisting_ui_guard_green_20261024.evidence) | Double-tap Confirm kept the balance at 30 on the existing M2 baseline, which already blocks confirmation while busy. |
-| RECOV-01 | [show-failure-and-restore-credits-after-failed-activation_test.md](../Tests/Kane/extensions/show-failure-and-restore-credits-after-failed-activation_test.md) | [RECOV-01_red_20261024.evidence](packs/RECOV-01_red_20261024.evidence) | Pending | Kane confirmed that failed mock activation left the group balance at 30 instead of restoring 40. |
+| RECOV-01 | [show-failure-and-restore-credits-after-failed-activation_test.md](../Tests/Kane/extensions/show-failure-and-restore-credits-after-failed-activation_test.md) | [RECOV-01_red_20261024.evidence](packs/RECOV-01_red_20261024.evidence) | [RECOV-01_green_20261024.evidence](packs/RECOV-01_green_20261024.evidence) | Kane caught the debit remaining after activation failure; the rerun confirmed the error appears and the 40-credit balance is restored with no active extension. |
 | PRIV-01 | Pending | — | — | Not yet verified |
 | SHARE-01 | Pending | — | — | Not yet verified |
 | SHARE-02 | Pending | — | — | Not yet verified |
 | AI-01 | Pending | — | — | Not yet verified |
 | AI-02 | Pending | — | — | Not yet verified |
 | SAFE-01 | Pending | — | — | Not yet verified |
+
+The full M3 extension regression suite is [M3_extensions_green_20261024.evidence](packs/M3_extensions_green_20261024.evidence) (4/4, 9 criteria).
 
 ## Final demo evidence
 
@@ -31,7 +33,9 @@ Validate selected packs with `kane-cli evidence validate <path>` before indexing
 ## What Kane caught
 
 - **Environment issue — M1 headless sign-in:** The ad hoc signed simulator app had no Keychain access group, so its first saved-session lookup failed. This was an environment issue, not a product bug; simulator-only Debug builds now store the session in the app sandbox.
-- **RECOV-01 — failed activation kept the debit:** Pre-guard run `c0448d15-2859-40a5-ace0-c7ec70f39f85` (execution `8c24563e-1539-46e7-a1cf-931214f0e697`) confirmed the group balance stayed at 30 credits instead of the asserted 40, and the app showed a device-application error. A confirmed extension remained visible with an expiry. Full red evidence is in [RECOV-01_red_20261024.evidence](packs/RECOV-01_red_20261024.evidence); no fix has been applied yet.
+- **RECOV-01 — failed activation kept the debit:** Pre-guard run `c0448d15-2859-40a5-ace0-c7ec70f39f85` (execution `8c24563e-1539-46e7-a1cf-931214f0e697`) confirmed the group balance stayed at 30 credits instead of the asserted 40, and the app showed a device-application error. A confirmed extension remained visible with an expiry. Full red evidence is in [RECOV-01_red_20261024.evidence](packs/RECOV-01_red_20261024.evidence). After reconciliation, green run `5717888e-31fa-436a-8752-fea8f88b9133` (execution `53296f8d-5a9e-4934-829c-89b934bbb4dc`) verified “Couldn't start extension,” balance 40, and no active extension; validated green evidence is in [RECOV-01_green_20261024.evidence](packs/RECOV-01_green_20261024.evidence).
+
+- **M3 extension bughunt:** Kane found no confirmed product defect; the session ended as an agent misstep because it analyzed before tapping Confirm. See [bughunt pack](packs/M3_extension_bughunt_agent_misstep_20261024.evidence).
 
 ## Not verified by Kane
 

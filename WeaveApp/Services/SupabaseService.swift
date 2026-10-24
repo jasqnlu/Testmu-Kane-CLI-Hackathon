@@ -7,6 +7,7 @@ protocol BackendServing {
     func groupSnapshot(_ session: AuthSession) async throws -> GroupSnapshot
     func extensionQuote(_ session: AuthSession, minutes: Int) async throws -> ExtensionQuote
     func confirmExtension(_ session: AuthSession, minutes: Int) async throws -> GroupSnapshot
+    func releaseReservation(_ session: AuthSession, extensionID: UUID) async throws -> GroupSnapshot
     #if DEBUG
     func resetNormal(_ session: AuthSession) async throws -> GroupSnapshot
     func seedLowBalance(_ session: AuthSession) async throws -> GroupSnapshot
@@ -51,6 +52,12 @@ struct SupabaseService: BackendServing {
     func confirmExtension(_ session: AuthSession, minutes: Int) async throws -> GroupSnapshot {
         let data = try await request("rest/v1/rpc/confirm_extension", token: session.accessToken,
                                      body: ["p_minutes": minutes])
+        return try decoder.decode(GroupSnapshot.self, from: data)
+    }
+
+    func releaseReservation(_ session: AuthSession, extensionID: UUID) async throws -> GroupSnapshot {
+        let data = try await request("rest/v1/rpc/release_reservation", token: session.accessToken,
+                                     body: ["p_extension_id": extensionID.uuidString])
         return try decoder.decode(GroupSnapshot.self, from: data)
     }
 
