@@ -11,7 +11,7 @@
 | EXT-01 | Pending | — | — | Not yet verified |
 | EXT-02 | Pending | — | — | Not yet verified |
 | EXT-03 | Pending | — | — | Not yet verified |
-| RECOV-01 | Pending | — | — | Not yet verified |
+| RECOV-01 | [show-failure-and-restore-credits-after-failed-activation_test.md](../Tests/Kane/extensions/show-failure-and-restore-credits-after-failed-activation_test.md) | [RECOV-01_red_20261024.evidence](packs/RECOV-01_red_20261024.evidence) | Pending | Kane confirmed that failed mock activation left the group balance at 30 instead of restoring 40. |
 | PRIV-01 | Pending | — | — | Not yet verified |
 | SHARE-01 | Pending | — | — | Not yet verified |
 | SHARE-02 | Pending | — | — | Not yet verified |
@@ -27,6 +27,11 @@
 - M1 Kane coverage: 9 of 46 criteria proven, 37 owed (25.9% risk-weighted coverage); [Kane cover report](coverage-m1.ndjson) and [validated pack](packs/M1_auth_groups_smoke.evidence). Historical M0 report: [coverage](coverage-m0.ndjson) and [gaps](coverage-gaps-m0.ndjson).
 
 Validate selected packs with `kane-cli evidence validate <path>` before indexing them. View a saved pack locally with `kane-cli evidence serve evidence/packs/<file>`.
+
+## What Kane caught
+
+- **Environment issue — M1 headless sign-in:** The ad hoc signed simulator app had no Keychain access group, so its first saved-session lookup failed. This was an environment issue, not a product bug; simulator-only Debug builds now store the session in the app sandbox.
+- **RECOV-01 — failed activation kept the debit:** Pre-guard run `c0448d15-2859-40a5-ace0-c7ec70f39f85` (execution `8c24563e-1539-46e7-a1cf-931214f0e697`) confirmed the group balance stayed at 30 credits instead of the asserted 40, and the app showed a device-application error. A confirmed extension remained visible with an expiry. Full red evidence is in [RECOV-01_red_20261024.evidence](packs/RECOV-01_red_20261024.evidence); no fix has been applied yet.
 
 ## Not verified by Kane
 

@@ -1,6 +1,6 @@
 # Kane run log
 
-M0 setup checks passed. M1 auth and group smoke passed after fixing a headless simulator session-storage issue. M2–M6 are pending. A pending or environment-failed check is never a product pass.
+M0 setup checks passed. M1 auth and group smoke passed after fixing a headless simulator session-storage issue. M2 extension paths now pass on the current worktree; the required red-before-guard evidence is still missing. M3–M6 remain pending. A pending or environment-failed check is never a product pass.
 
 ## Session environment
 
@@ -43,7 +43,7 @@ For failures, record the failing step, expected versus observed outcome, screens
 
 ## Unresolved
 
-- M2–M6 feature work remains: extension ledger, safety/recovery, privacy/sharing, OpenAI card, and full journey.
+- M2 is green on the current worktree but lacks its intended pre-guard red evidence; M3–M6 feature work remains: extension safety/recovery, privacy/sharing, OpenAI card, and full journey.
 - Product OpenAI call, SQL concurrency/RLS checks, a genuine red→green pair, exploration, five AI privacy runs, and final journey pack remain pending.
 - Dedicated SQL concurrency and RLS tests are still required. Existing authenticated API privilege probes are summarized in `evidence/backend-m1-api-checks.json`.
 
@@ -69,11 +69,34 @@ For failures, record the failing step, expected versus observed outcome, screens
 - A second six-case M1 suite passed at 12:07 PDT after restricting simulator storage to Debug. The deterministic session race checks passed 5/5. Release compile and final no-debug/no-fixture scan passed.
 - M1 implementation committed as `ccd62d6` at 12:08:55 PDT, after the final 6/6 Kane run passed. Release compile/scan and the unsigned demo launcher both passed.
 
+## M2 session (extension flow)
+
+- Session-start Kane preflight: `kane-cli 0.10.0-rc.3`, authenticated; balance **100,764.3736** credits. `devices list` returned zero simulators. `doctor --target simulator` and `doctor --target simulator --install` both found Xcode 27.0 but could not connect to CoreSimulatorService (environment failure; no feature result).
+- Started the M2 implementation after the dedicated `docs: spec update` commit. The existing CREDIT-02 test is requirement-linked; preserve its red-before-guard order.
+- The M2 code and migration were already present in the uncommitted worktree when this session began. The confirm-side balance check was already in that migration, so no pre-guard red was run or claimed. Applied the current migration to the confirmed Weave project; the authenticated low-balance fixture returned Study / 5 credits. The current migration checks the locked balance before deduction and extension creation.
+- Build: the sandboxed `Scripts/build-sim.sh` failed because Swift's macro server could not run under the sandbox. The approved build completed successfully with Xcode 27 and produced `builds/Weave.zip`.
+- 2026-10-24 12:36:21 PDT | `reject-a-ten-minute-request-at-five-credits_test.md` | CREDIT-02 | ENVIRONMENT / exit 2; no `test_md_done` | simulator setup | `xcrun` could not reach CoreSimulatorService in the sandbox; no UI steps ran.
+- 2026-10-24 12:36:51 PDT | `reject-a-ten-minute-request-at-five-credits_test.md` | CREDIT-02 | ENVIRONMENT / exit 2; no `test_md_done` | simulator startup | App installed, then Xcode 27's missing `Simulator.app` caused the automation session to disappear; no assertions ran.
+- 2026-10-24 12:37:58 PDT | `reject-a-ten-minute-request-at-five-credits_test.md` | CREDIT-02 | ENVIRONMENT / exit 2; no `test_md_done` | simulator startup | Explicit app/device settings still hit the missing `Simulator.app`; no assertions ran.
+- 2026-10-24 12:39:20 PDT | `reject-a-ten-minute-request-at-five-credits_test.md` | CREDIT-02 | ENVIRONMENT / exit 2; no `test_md_done` | simulator startup | Retried after stopping stale Appium/WebDriverAgent processes; same missing `Simulator.app` error, no assertions ran. `Tests/Kane/HEADLESS.md` documents the wrapper that resolved startup.
+- 2026-10-24 12:40–12:44 PDT | `reject-a-ten-minute-request-at-five-credits_test.md` | CREDIT-02 | PASSED (`test_md_done`, exit 0; 169s) | Kane | At 5 credits, request declined with “Not enough group credits”; balance stayed 5 and no extension activated. Criteria AC-13, AC-20, AC-21, AC-22 passed.
+- 2026-10-24 12:44–12:48 PDT | `confirm-cost-then-activate-ten-minutes-at-thirty-credits_test.md` | EXT-01, EXT-02 | PASSED (`test_md_done`, exit 0; 186s) | Kane | Quote showed 10 minutes / 10 credits with balance unchanged at 40; confirm deducted to 30 and displayed an active extension with a valid expiry. Criteria AC-10, AC-13, AC-23, AC-24, AC-25 passed.
+- 2026-10-24 12:49–12:59 PDT | serial extension neighbor suite (confirmation + cancel/dismiss) | EXT-01, EXT-02 | PASSED (`testrun_done`, exit 0; 2/2; 609s) | Kane | Cancel and dismiss retained 40 credits with no active extension. AC-26 also passed. Evidence pack: `.testmuai/evidence/4c458feb-6661-4c7e-b568-be7b4b8eb2ab.evidence`.
+- `kane-cli cover --mode agent` completed: 18/46 criteria proven (36.34% risk-weighted coverage). M2 is green on the current worktree; no product code change or commit was made in this session. M3 safety/recovery remains separate work.
+
 ## Readiness metric ledger
 
 Refresh this ledger after each milestone and use a final `kane-cli cover` result in the submission report.
 
 - Regressions or implementation issues caught before their commit: **4** in M1 (two stale-session/loading races in source review, one headless Keychain failure exposed during the first Kane attempt, and one simulator-session identifier found in the Release scan).
-- Requirements proven vs owed: **9/46 proven, 37 owed** in the latest M1 `kane-cli cover` report at `evidence/coverage-m1.ndjson`; refresh at final readiness.
+- Requirements proven vs owed: **18/46 proven, 28 owed** in the latest project `kane-cli cover` report after M2; refresh at final readiness.
 - Code change to verified commit: M1 first implementation file [migration](Supabase/migrations/202610240001_m1_auth_groups.sql) created at 11:26:06 PDT; verified commit `ccd62d6` at 12:08:55 PDT, **42m 49s** (one measured milestone so far).
 - AI leak rate: **0/0 runs completed before guard and 0/0 after guard**; the five fresh-run measurements are pending, so no leak rate is claimed.
+
+## M3 session (test-first safety checks)
+
+- Session preflight: Kane 0.10.0-rc.3, authenticated; balance 100,538.0368 credits; device iPhone 17 Pro, iOS 26.5. CoreSimulator access required host permissions; Xcode 27 has no Simulator.app, so runs use `Scripts/with-kane-simulator.sh`.
+- 2026-10-24 13:08 PDT | `keep-the-balance-at-30-after-duplicate-confirmation_test.md` | EXT-03 | ENVIRONMENT / exit 2; no `test_md_done` | simulator startup | Managed driver could not open `Simulator.app`; no product steps ran. Retried with documented headless Appium wrapper.
+- 2026-10-24 13:10–13:17 PDT | `keep-the-balance-at-30-after-duplicate-confirmation_test.md` | EXT-03 | BROKEN / exit 1; `test_md_done` failed | Kane agent misstep, not product | Test stopped before its extension assertion because the password field remained blank during sign-in. The terminal verdict says the agent failed to focus/verify the SecureField; no extension behavior was observed. Pack `f788f4ed-83bf-4320-b4b4-7531c3ac3745.evidence`. Do not count as product red or pass. Next: inspect/recover the test's sign-in setup, then run both M3 tests against the unguarded implementation.
+- 2026-10-24 13:18 PDT | `show-failure-and-restore-credits-after-failed-activation_test.md` | RECOV-01 | CANCELLED / exit 130 before `test_md_done` | test data setup | The run announced unresolved `activation_failure_fixture`; cancelled before any UI step rather than type its placeholder. Filled it as the Debug control reference `Fail next activation`; retrying.
+- 2026-10-24 13:19:06–13:21:58 PDT | `show-failure-and-restore-credits-after-failed-activation_test.md` | RECOV-01 | FAILED / `test_md_done` failed, process exit 1 | product | Run ID/session `c0448d15-2859-40a5-ace0-c7ec70f39f85`; execution `8c24563e-1539-46e7-a1cf-931214f0e697`; source HEAD `ba2a229309023c95e36aadaccc5bf862fb02ce04` (M2 changes were in the worktree; no M3 recovery guard). Failing assertion: error should read “Couldn't start extension” and balance should return to 40; observed “Your group time was approved, but this device couldn't apply it.” and 30 credits. Kane also found the confirmed extension still present. Full pack saved and validated as `evidence/packs/RECOV-01_red_20261024.evidence`. This is an honest pre-guard product red; next commit preserves it before any fix.
