@@ -32,6 +32,10 @@ Validate selected packs with `kane-cli evidence validate <path>` before indexing
 
 ## What Kane caught
 
+- **M4 PRIV-01 red/green pair complete:** the pre-guard Bob-feed test failed at nested run step 3 with Alice's private reason visible; the post-filter rerun passed. Packs: [PRIV-01 red](packs/PRIV-01_red_20261024.evidence) and [PRIV-01 green](packs/PRIV-01_green_20261024.evidence).
+- **M5 headless session-store issue (environment):** the OpenAI baseline Kane session registered a test but stalled before any test step or terminal event. The local Kane process was stopped and the simulator reset attempt was completed with host permissions. This is an environment issue, not a product bug; it is not counted as a run.
+- **M5 direct function probe:** `draft-card` is deployed ACTIVE version 2, but the authenticated direct probe returned HTTP 200 with `source: fallback`; see [redacted direct probe](packs/AI-01_direct_openai_probe_fallback_20261024.json). The configured secret name is present, but no OpenAI-backed response has been confirmed yet.
+
 - **Environment issue — M1 headless sign-in:** The ad hoc signed simulator app had no Keychain access group, so its first saved-session lookup failed. This was an environment issue, not a product bug; simulator-only Debug builds now store the session in the app sandbox.
 - **RECOV-01 — failed activation kept the debit:** Pre-guard run `c0448d15-2859-40a5-ace0-c7ec70f39f85` (execution `8c24563e-1539-46e7-a1cf-931214f0e697`) confirmed at testmd step 2 / nested run step 4 that the group balance stayed at 30 credits instead of the asserted 40, and the app showed a device-application error. A confirmed extension remained visible with an expiry. Full red evidence is in [RECOV-01_red_20261024.evidence](packs/RECOV-01_red_20261024.evidence). After reconciliation, green run `5717888e-31fa-436a-8752-fea8f88b9133` (execution `53296f8d-5a9e-4934-829c-89b934bbb4dc`) verified “Couldn't start extension,” balance 40, and no active extension; validated green evidence is in [RECOV-01_green_20261024.evidence](packs/RECOV-01_green_20261024.evidence).
 

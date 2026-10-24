@@ -1,0 +1,29 @@
+{
+  "observed_at": "2026-10-24T15:11:00-07:00",
+  "probe": "direct authenticated POST to /functions/v1/draft-card",
+  "project_ref": "wwlbaihtcyyfxoesyytr",
+  "deployment": {
+    "slug": "draft-card",
+    "status": "ACTIVE",
+    "version": 2
+  },
+  "request_facts": {
+    "minutes": 10,
+    "time_of_day": "afternoon",
+    "achievement": "organized study notes",
+    "extension_id": "[redacted]"
+  },
+  "response": {
+    "http_status": 200,
+    "source": "fallback",
+    "draft": "Alice used 10 group minutes.",
+    "private_reason_terms_detected": false
+  },
+  "secret_check": {
+    "name": "OPENAI_API_KEY",
+    "present": true,
+    "value_recorded": false
+  },
+  "interpretation": "Not an OpenAI-backed response. The function maps absent key and OpenAI request errors to the same fallback, so this probe does not establish which occurred. Does not count toward AI-01 or AI-02.",
+  "credentials_recorded": false
+}
