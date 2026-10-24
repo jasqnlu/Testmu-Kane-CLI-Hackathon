@@ -24,6 +24,14 @@
     "present": true,
     "value_recorded": false
   },
-  "interpretation": "Not an OpenAI-backed response. The function maps absent key and OpenAI request errors to the same fallback, so this probe does not establish which occurred. Does not count toward AI-01 or AI-02.",
+  "follow_up_diagnostic_probe": {
+    "http_status": 200,
+    "source": "fallback",
+    "sanitized_category": "openai_http_429_insufficient_quota_credit_balance_exhausted",
+    "draft": "[redacted]",
+    "private_reason_terms_detected": false,
+    "interpretation": "The function reached OpenAI, but the API organization has no available credit balance. This does not establish a successful OpenAI-backed draft and counts toward neither AI-01 nor AI-02."
+  },
+  "interpretation": "Initial direct probe returned fallback. A temporary diagnostic deployment established that the OpenAI request failed because the API credit balance was exhausted. Does not count toward AI-01 or AI-02.",
   "credentials_recorded": false
 }
