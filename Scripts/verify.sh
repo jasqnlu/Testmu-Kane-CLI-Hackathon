@@ -20,11 +20,11 @@ if [[ -z "$(find Tests/Kane -type f -name '*_test.md' -print -quit)" ]]; then
   exit 2
 fi
 
+# M1: smoke covers implemented setup, authentication and group behaviors only.
+# Expand this selection as later milestones become verified.
+Scripts/seed.sh "${WEAVE_SCENARIO:-normal}"
 if [[ "$selection" == "smoke" ]]; then
-  echo "M0 BLANK-APP ONLY: smoke skips server seeding; it cannot verify auth, credits, privacy, or AI." >&2
-  echo "Kane terminal result and process exit determine this run's outcome." >&2
-else
-  Scripts/seed.sh "${WEAVE_SCENARIO:-normal}"
+  echo "M1 SMOKE: setup, authentication and groups; extensions/privacy/AI are not included yet." >&2
 fi
 
 case "$selection" in
@@ -37,7 +37,7 @@ case "$selection" in
     ;;
   *)
     if [[ "$selection" == "smoke" ]]; then
-      exec Scripts/with-kane-simulator.sh env KANE_CLI_USER_AGENT=codex kane-cli testrun run --match '^Tests/Kane/setup/' --tags smoke --parallel 1 --agent < /dev/null
+      exec Scripts/with-kane-simulator.sh env KANE_CLI_USER_AGENT=codex kane-cli testrun run --match '^Tests/Kane/(setup/|auth/(?!release-)|groups/)' --tags smoke --parallel 1 --agent < /dev/null
     fi
     exec Scripts/with-kane-simulator.sh env KANE_CLI_USER_AGENT=codex kane-cli testrun run --match '^Tests/Kane/' --tags "$selection" --parallel 1 --agent < /dev/null
     ;;

@@ -1,0 +1,22 @@
+{
+  "project_ref": "wwlbaihtcyyfxoesyytr",
+  "project_name": "Weave",
+  "initial_public_tables": [],
+  "migration": "Supabase/migrations/202610240001_m1_auth_groups.sql",
+  "schema_deployed": true,
+  "confirmed_owned_accounts": [
+    "alice@weave.test",
+    "bob@weave.test",
+    "charlie@weave.test"
+  ],
+  "rpc": [
+    "group_snapshot",
+    "debug_reset_normal"
+  ],
+  "secret_names_checked": [],
+  "missing_for_M5": [
+    "OPENAI_API_KEY",
+    "OPENAI_MODEL"
+  ],
+  "notes": "No OpenAI secret read or created. No unrelated data reset or deleted. API checks are not Kane UI proof."
+}

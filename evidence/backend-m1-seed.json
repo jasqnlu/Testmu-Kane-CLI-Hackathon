@@ -1,0 +1,12 @@
+{
+  "project_ref": "wwlbaihtcyyfxoesyytr",
+  "scenario": "normal",
+  "group_name": "Study",
+  "balance": 40,
+  "members": [
+    "Alice",
+    "Bob",
+    "Charlie"
+  ],
+  "verification": "authenticated password grant and debug_reset_normal RPC; not a Kane UI pass"
+}

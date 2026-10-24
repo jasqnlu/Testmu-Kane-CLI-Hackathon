@@ -1,0 +1,232 @@
+[
+  {
+    "ref": "ac-1",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against AUTH-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-2",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against AUTH-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-3",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against AUTH-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-4",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against AUTH-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-5",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against SAFE-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-6",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against SAFE-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-7",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against SAFE-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-8",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against SAFE-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-9",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against SAFE-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-10",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against CREDIT-01, CREDIT-02, EXT-01, EXT-02, EXT-03, RECOV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-11",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against CREDIT-01, CREDIT-02, EXT-01, EXT-02, EXT-03, RECOV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-12",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against CREDIT-01, CREDIT-02, EXT-01, EXT-02, EXT-03, RECOV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-13",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against CREDIT-01, CREDIT-02, EXT-01, EXT-02, EXT-03, RECOV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-14",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against CREDIT-01, CREDIT-02, EXT-01, EXT-02, EXT-03, RECOV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-15",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against CREDIT-01, CREDIT-02, EXT-01, EXT-02, EXT-03, RECOV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-16",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against CREDIT-01, CREDIT-02, EXT-01, EXT-02, EXT-03, RECOV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-17",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against CREDIT-01, CREDIT-02, EXT-01, EXT-02, EXT-03, RECOV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-18",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against CREDIT-01, CREDIT-02, EXT-01, EXT-02, EXT-03, RECOV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-19",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against CREDIT-01, CREDIT-02, EXT-01, EXT-02, EXT-03, RECOV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-20",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against CREDIT-01, CREDIT-02, EXT-01, EXT-02, EXT-03, RECOV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-21",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against CREDIT-01, CREDIT-02, EXT-01, EXT-02, EXT-03, RECOV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-22",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against CREDIT-01, CREDIT-02, EXT-01, EXT-02, EXT-03, RECOV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-23",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against CREDIT-01, CREDIT-02, EXT-01, EXT-02, EXT-03, RECOV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-24",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against CREDIT-01, CREDIT-02, EXT-01, EXT-02, EXT-03, RECOV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-25",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against CREDIT-01, CREDIT-02, EXT-01, EXT-02, EXT-03, RECOV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-26",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against CREDIT-01, CREDIT-02, EXT-01, EXT-02, EXT-03, RECOV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-27",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against CREDIT-01, CREDIT-02, EXT-01, EXT-02, EXT-03, RECOV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-28",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against PRIV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-29",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against PRIV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-30",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against PRIV-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-31",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against SHARE-01, SHARE-02, AI-01, AI-02 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-32",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against SHARE-01, SHARE-02, AI-01, AI-02 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-33",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against SHARE-01, SHARE-02, AI-01, AI-02 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-34",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against SHARE-01, SHARE-02, AI-01, AI-02 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-35",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against SHARE-01, SHARE-02, AI-01, AI-02 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-36",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against SHARE-01, SHARE-02, AI-01, AI-02 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-37",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against SHARE-01, SHARE-02, AI-01, AI-02 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-38",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against SHARE-01, SHARE-02, AI-01, AI-02 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-39",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against SHARE-01, SHARE-02, AI-01, AI-02 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-40",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against SHARE-01, SHARE-02, AI-01, AI-02 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-41",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against SHARE-01, SHARE-02, AI-01, AI-02 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-42",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against GROUP-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-43",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against GROUP-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-44",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against GROUP-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-45",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against GROUP-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  },
+  {
+    "ref": "ac-46",
+    "resolution": "approved",
+    "reason": "Reviewed exact criterion text against GROUP-01 in acceptance-criteria.md; matches source, approved under supplied kane-assure review instruction."
+  }
+]

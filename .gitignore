@@ -28,3 +28,15 @@ Supabase/.branches/
 .testmuai/evidence/
 .testmuai/testruns/
 .testmuai/runs/
+
+# Local Supabase configuration and generated DEBUG-only test credentials
+Config/Backend.json
+Config/TestAccounts.json
+WeaveApp/Services/LocalConfiguration.swift
+
+# Generated local Supabase/app configuration (never commit test credentials)
+Config/
+
+# Python helper bytecode
+__pycache__/
+*.pyc

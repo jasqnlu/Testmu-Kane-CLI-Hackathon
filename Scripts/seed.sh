@@ -8,14 +8,23 @@ if [[ "$#" -ne 1 ]]; then
   exit 2
 fi
 case "$scenario" in
-  normal|low-balance|private-reason) ;;
+  normal)
+    if [[ ! -f Config/Backend.json || ! -f Config/TestAccounts.json ]]; then
+      echo "Backend is not configured. Run Scripts/configure-backend.py with an authorized Supabase CLI login." >&2
+      exit 2
+    fi
+    exec python3 Scripts/configure-backend.py --seed-normal
+    ;;
+  low-balance)
+    echo "Seed unavailable: low-balance requires the M2 server credit functions; no data changed." >&2
+    exit 2
+    ;;
+  private-reason)
+    echo "Seed unavailable: private-reason requires the M4 private extension schema; no data changed." >&2
+    exit 2
+    ;;
   *)
     echo "Unknown scenario: $scenario. Choose normal, low-balance, or private-reason." >&2
     exit 2
     ;;
 esac
-
-# M0 intentionally has no seed implementation. Never treat this as a successful reset.
-echo "Seed unavailable: Supabase backend and test-user seed RPC are not configured for '$scenario'." >&2
-echo "No server data was changed. Complete M1 backend setup before running feature verification." >&2
-exit 2

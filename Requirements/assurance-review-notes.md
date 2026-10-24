@@ -37,3 +37,7 @@ Design completed with terminal complete and process exit 0 (15.04 credits), prod
 ## Remaining design limitations
 
 The four remaining use-case designs completed sequentially with no pause, using 74.91 credits in total. They produced 15 tests, all moved into `Tests/Kane/`; no design result is a UI pass. Credentials and generated fixtures must be supplied before authoring. SQL concurrency/RLS and the Release build remain separate verification work. A final journey test, Debug reset helper, and runnable deterministic app-side fixture controls must still be designed/configured for the later milestones.
+
+## M1 fixture and setup review
+
+All 46 generated criterion texts were read and matched against the supplied requirements; approvals are recorded in criteria-review-verdicts.json. This resolves derived-criterion approval warnings, without claiming execution. M1 introduces persistent Keychain sessions, so the M0 blank-shell smoke now explicitly resets via Debug before checking the same four controls. The old always-signed-out startup assumption no longer holds; assertions are unchanged. Its embedded M0 context was updated to acknowledge the implemented Debug tab. One-shot failure fixture directions are configured in ignored Kane variables.

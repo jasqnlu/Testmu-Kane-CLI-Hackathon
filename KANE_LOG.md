@@ -1,12 +1,12 @@
 # Kane run log
 
-M0 live smoke, saved replay and setup suite passed. Product-feature tests have not run. Environment checks and run outcomes are appended below. A pending or environment-failed check is never a product pass.
+M0 setup checks passed. M1 auth and group smoke passed after fixing a headless simulator session-storage issue. M2–M6 are pending. A pending or environment-failed check is never a product pass.
 
 ## Session environment
 
 - Date: 2026-10-24 (America/Los_Angeles).
-- Kane version: 0.9.0.
-- Starting balance: 101,200 credits (preflight, authenticated).
+- Kane version: 0.10.0-rc.3.
+- Starting balance: 101,078.2211 credits (preflight, authenticated).
 - Simulator device and OS: iPhone 17 Pro, iOS 26.5 (exact Kane device listing).
 - Blank-app smoke result: live run, saved replay and setup suite passed with exit 0.
 
@@ -25,13 +25,23 @@ M0 live smoke, saved replay and setup suite passed. Product-feature tests have n
 
 | 2026-10-24 11:20–11:21 PDT | Scripts/verify.sh smoke (M0 setup only) | M0 setup | PASSED / exit 0; testrun_done passed | verification | Build succeeded; 1/1 replayed test passed, 0 skipped/broken; suite evidence validated. Next: backend selection for M1. |
 
+| 2026-10-24 11:32–11:34 PDT | M1 existing-user sign-in, first attempt | AUTH-01 | STOPPED / exit 130; no test_md_done | simulator integration | Screenshot showed "Couldn't access your saved sign-in" before network sign-in. Headless app is ad hoc signed and has no Keychain access group. Added app-sandbox session storage for simulator builds only; iOS device builds retain Keychain. No pass claimed. |
+
+| 2026-10-24 11:35–11:38 PDT | Existing-user sign-in rerun | AUTH-01 | PASSED / exit 0; test_md_done passed | verification | Supabase accepted Alice's credentials; Kane saw "Hi, Alice" and final_state `signed_in_user_name_shown=true`. |
+
+| 2026-10-24 11:39–11:57 PDT | `Scripts/verify.sh smoke` (M1) | AUTH-01, GROUP-01 | PASSED / exit 0; testrun_done passed | verification | 6/6 passed, 0 failed/broken/skipped; 9 criteria proven. Pack validated at `evidence/packs/M1_auth_groups_smoke.evidence`. Next: M2 extensions, insufficient-credit red test first. |
+
+| 2026-10-24 11:35 PDT | Release simulator scan (first pass) | SAFE-01 | BUILD PASSED / scan failed | security review | No local credentials or Debug controls found, but the simulator session key identifier was present in the Release executable. Narrowed the sandbox session store to `DEBUG && targetEnvironment(simulator)` and reran the full suite. |
+
+| 2026-10-24 11:59–12:07 PDT | `Scripts/verify.sh smoke` (post-guard fix) | AUTH-01, GROUP-01 | PASSED / exit 0; testrun_done passed | regression check | 6/6 passed, 0 failed/broken/skipped; 9 criteria proven. All six members now replayed. Updated pack at `evidence/packs/M1_auth_groups_smoke.evidence` validated. |
+
 For failures, record the failing step, expected versus observed outcome, screenshot path inside the evidence pack, and stored final-state values. Label honest red evidence as **feature-not-yet-implemented** or **found-by-exploration**. Record all attempts, including environment failures.
 
 ## Unresolved
 
-- Backend not selected: no local Docker/Podman; hosted projects discovered but none confirmed for Weave. M1–M7 and all feature requirements remain pending.
-- Product OpenAI call, SQL concurrency/RLS checks, real red→green pair, exploration, five AI privacy runs and final journey pack remain pending.
-- Designed criteria approval and fixture variables remain open; see Requirements/assurance-review-notes.md.
+- M2–M6 feature work remains: extension ledger, safety/recovery, privacy/sharing, OpenAI card, and full journey.
+- Product OpenAI call, SQL concurrency/RLS checks, a genuine red→green pair, exploration, five AI privacy runs, and final journey pack remain pending.
+- Dedicated SQL concurrency and RLS tests are still required. Existing authenticated API privilege probes are summarized in `evidence/backend-m1-api-checks.json`.
 
 ## Setup and assurance events
 
@@ -43,3 +53,13 @@ For failures, record the failing step, expected versus observed outcome, screens
 - 2026-10-24 11:10 PDT: M0 build exit 65 at codesign due Desktop Finder/iCloud metadata; simulator-only signing disabled, rebuild exit 0. No UI verification claimed from build.
 
 - 2026-10-24 11:20 PDT: assurance designs uc-1 through uc-5 all completed with process exit 0. 19 feature tests retained; 5/5 use cases designed. `cover` and `cover gaps` exit 0; product requirements 0% proven. 101,078.2211 credits remain. Generated criteria approval, fixture variables, SQL-only checks and live feature runs remain open.
+
+## M1 session (project confirmed by user)
+
+- User confirmed project wwlbaihtcyyfxoesyytr, renamed Weave. Public schema was empty before migration. M1 schema and three owned test accounts created; no unrelated data reset.
+- Preflight: Kane0.10.0-rc.3 authenticated, simulator doctor passed; starting balance101,078.2211.
+- Backend authenticated seed/API/RLS privilege checks passed; these are not Kane UI passes. Safe summaries: evidence/backend-m1-api-checks.json and backend-m1-seed.json.
+- Before UI verification, read-only review found delayed group fetch/refresh could restore a signed-out identity or stale group. Fixing session generation invalidation before the first M1 Kane run; this was code review, not a Kane catch.
+- OPENAI_API_KEY and OPENAI_MODEL absent from Supabase secret-name listing; user asked to set API key through dashboard, no key requested in chat.
+- M1 suite completed at 11:57 PDT: all six smoke cases passed; detailed criterion coverage is in the validated run pack. The initial simulator-store failure and simulator-only fix are recorded above.
+- A second six-case M1 suite passed at 12:07 PDT after restricting simulator storage to Debug. The deterministic session race checks passed 5/5. Release compile and final no-debug/no-fixture scan are completing before the M1 commit.

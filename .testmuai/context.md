@@ -1,6 +1,6 @@
 # Weave iOS test context
 
-Current milestone: M0 blank sign-in shell. The backend and Debug tab are not implemented yet. The behaviors below describe the acceptance target for later milestones, not existing functionality. For the M0 smoke objective, verify the sign-in screen only.
+Current milestone: M1 real Supabase sign-in and group overview. The Debug tab and normal scenario are implemented; extensions, privacy/feed and AI below remain acceptance targets for later milestones. Before each independent test, use Debug → Reset to clear the local session, unless the test explicitly continues another test via import. Reset returns to Sign in. Never reset after arming a one-shot failure fixture.
 
 Weave is an iOS app built with SwiftUI and Supabase. It turns extra screen time into a shared group credit budget. Private reasons remain private unless the user deliberately shares a reviewed activity card.
 

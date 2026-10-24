@@ -3,7 +3,7 @@ import SwiftUI
 struct SignInView: View {
     @State private var email = ""
     @State private var password = ""
-    @State private var showsSetupNotice = false
+    @EnvironmentObject private var store: AppStore
     private let ink = Color(red: 0.14, green: 0.25, blue: 0.22)
 
     var body: some View {
@@ -51,17 +51,27 @@ struct SignInView: View {
                             .accessibilityIdentifier("auth.password")
                     }
                     Button {
-                        showsSetupNotice = true
+                        Task { await store.signIn(email: email, password: password) }
                     } label: {
-                        Text("Sign in")
+                        HStack {
+                            if store.isBusy { ProgressView().tint(.white) }
+                            Text(store.isBusy ? "Signing in…" : "Sign in")
+                        }
                             .font(.headline)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
                     }
+                    .disabled(store.isBusy)
                     .buttonStyle(.plain)
                     .foregroundStyle(.white)
                     .background(ink, in: RoundedRectangle(cornerRadius: 14))
                     .accessibilityIdentifier("auth.signIn")
+                    if let error = store.authError {
+                        Text(error)
+                            .font(.callout)
+                            .foregroundStyle(.red)
+                            .accessibilityIdentifier("auth.error")
+                    }
                 }
                 Text("Your reasons are yours. Sharing is always your choice.")
                     .font(.footnote)
@@ -75,10 +85,6 @@ struct SignInView: View {
         }
         .background(Color(red: 0.95, green: 0.96, blue: 0.92))
         .foregroundStyle(ink)
-        .alert("Sign-in setup pending", isPresented: $showsSetupNotice) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text("This setup build does not connect to Supabase yet.")
-        }
+
     }
 }

@@ -2,13 +2,13 @@
 
 Weave turns extra screen time into a shared group credit budget, where going over costs your friends something and your reasons stay private unless you choose to share.
 
-**Current status: M0 simulator checkpoint verified; backend selection required for M1.** The SwiftUI simulator app builds, and its blank sign-in screen passed a live Kane simulator check. Saved replay and the M0 setup suite also passed with exit 0. The auth, group, credit ledger, privacy, and AI features are not yet verified. This repository is not ready to submit. The implementation plan and acceptance criteria are in [Requirements](Requirements/acceptance-criteria.md).
+**Current status: M1 auth and group flows verified.** The app signs in through Supabase, shows the signed-in user's group and balance, and handles invalid credentials and group-fetch errors. Kane passed all six M1 smoke cases; the validated evidence pack is indexed in [evidence/EVIDENCE.md](evidence/EVIDENCE.md). Extensions, credit mutations, privacy, and AI are still in progress. This repository is not ready to submit. The implementation plan and acceptance criteria are in [Requirements](Requirements/acceptance-criteria.md).
 
 The intended judge flow is sign in → group balance → personal limit → request 10 minutes → Confirm → active extension and reduced balance → Keep Private or Share with Group → review/edit an AI draft → Post to the group feed.
 
 ## Setup and run
 
-Use an Apple Silicon Mac with full Xcode, an installed iPhone simulator runtime, Git, Node/npm, and Kane CLI. Supabase CLI and a configured test backend will be required for M1 onward.
+Use an Apple Silicon Mac with full Xcode, an installed iPhone simulator runtime, Git, Node/npm, Kane CLI, and Supabase CLI. Configure the Weave Supabase project and its local public URL/key before building. Keep test account credentials in the ignored local configuration files; never commit them.
 
 ```sh
 git clone https://github.com/jasqnlu/Testmu-Kane-CLI-Hackathon.git
@@ -37,7 +37,7 @@ Build and verify from any working directory using the script path, or run this a
 Scripts/verify.sh smoke
 ```
 
-On Xcode 27, verification uses the supported headless Appium configuration documented in [HEADLESS.md](Tests/Kane/HEADLESS.md). Kane remains the UI verifier.
+On Xcode 27, verification uses the supported headless Appium configuration documented in [HEADLESS.md](Tests/Kane/HEADLESS.md). Kane remains the UI verifier. The simulator stores its Kane test session in the app sandbox because the headless simulator build is ad hoc signed; device builds use Keychain.
 
 The build script runs:
 
@@ -45,23 +45,23 @@ The build script runs:
 xcodebuild -scheme Weave -sdk iphonesimulator -configuration Debug -derivedDataPath build
 ```
 
-It packages `Weave.app` as `builds/Weave.zip`, the input format for Kane's simulator target. At M0, the smoke command explicitly verifies **only the blank app** and skips server seeding. During M0, `smoke` selects only `Tests/Kane/setup/`; it exits with an error if no runnable tests exist. It does not claim a feature or full-journey pass. Feature selections such as `Scripts/verify.sh credits` or `Scripts/verify.sh Tests/Kane/credits/example_test.md` require backend seeding; `Scripts/seed.sh normal` currently fails clearly because that backend is not configured.
+It packages `Weave.app` as `builds/Weave.zip`, the input format for Kane's simulator target. `Scripts/verify.sh smoke` seeds the normal owned fixture and runs M1 setup, auth, and group tests serially. Later features are not included until their milestones are verified.
 
 ## Kane verification
 
 Kane is the UI verifier. Repo-local skills in [.agents/skills](.agents/skills) implement setup, requirement-driven assurance design, build/seed/run/fix loops, replay suites, exploration, AI privacy checks, and sealed evidence collection. Runs use agent output; results require both the completed terminal event and process exit. Errors, timeouts, and skipped checks never count as passes.
 
-[AGENTS.md](AGENTS.md) records the rules. [KANE_LOG.md](KANE_LOG.md) records completed runs and next actions. The designed suite is under `Tests/Kane/`: 19 unexecuted feature tests plus the saved M0 smoke. All five use cases are designed; current product coverage is 0%, not a feature pass. After every change under `WeaveApp/` or `Supabase/`, run the verification loop before committing. The intended final command remains `Scripts/verify.sh smoke`; M1 will replace the blank-app seed exception with deterministic server setup.
+[AGENTS.md](AGENTS.md) records the rules. [KANE_LOG.md](KANE_LOG.md) records completed runs and next actions. The requirement-linked suite is under `Tests/Kane/`; M1 auth and group tests now pass through the live Supabase backend. After every change under `WeaveApp/` or `Supabase/`, run the verification loop before committing. The final command remains `Scripts/verify.sh smoke`, with each milestone adding its verified paths.
 
 ### What Kane caught
 
-No product defect has been verified yet. Kane exposed an obsolete Xcode simulator UI path and a moved-test ZIP path error; both are environment/test issues, not product red/green evidence. See the [evidence index](evidence/EVIDENCE.md) for real red/green pairs, coverage, and final journey/smoke packs as they are produced. No final submission pack is available yet. View a collected pack with `kane-cli evidence serve evidence/packs/<file>`.
+Kane exposed a headless simulator session-store incompatibility before the M1 auth run; the simulator-only storage path fixed it and the rerun passed. No feature red/green pair has been recorded yet. See the [evidence index](evidence/EVIDENCE.md) for proven requirements and open gates. No final submission pack is available yet. View a collected pack with `kane-cli evidence serve evidence/packs/<file>`.
 
 | Area | Verification method | Current status |
 | --- | --- | --- |
 | Installed tooling | Local command checks | Apple Silicon host; Kane, Xcode, Supabase, and GitHub CLIs found; simulator doctor passed after driver install; Xcode 27 headless workaround documented |
 | Blank-app sign-in smoke | Kane on iOS Simulator | Live objective passed, exit 0; [pack](evidence/packs/M0_signin_green.evidence) |
-| Auth and group (AUTH-01, GROUP-01) | Kane | Pending |
+| Auth and group (AUTH-01, GROUP-01) | Kane on iOS Simulator | M1 verified; 6/6 smoke tests passed, [pack](evidence/packs/M1_auth_groups_smoke.evidence) |
 | Confirmation, credits, duplicate taps, recovery | Kane and SQL where specified | Pending |
 | Ledger concurrency (CREDIT-01) | SQL concurrency test | Pending; Kane cannot prove this |
 | Keep Private and reviewed sharing | Kane | Pending |

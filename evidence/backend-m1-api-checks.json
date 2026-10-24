@@ -1,0 +1,17 @@
+{
+  "checks": [
+    "Alice: password sign-in, own snapshot, member/profile RLS reads passed",
+    "Bob: password sign-in, own snapshot, member/profile RLS reads passed",
+    "Charlie: password sign-in, own snapshot, member/profile RLS reads passed",
+    "Anonymous group snapshot rejected",
+    "Application roles cannot update balances/add members; anonymous cannot execute snapshot/reset",
+    "Idempotent configure preserved owned test identities and saved credentials"
+  ],
+  "privileges": {
+    "anon_reset": false,
+    "anon_snapshot": false,
+    "client_add_member": false,
+    "client_balance_update": false
+  },
+  "scope": "API/schema checks only; Kane UI and full SQL RLS/concurrency suite still required"
+}
