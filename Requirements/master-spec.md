@@ -232,10 +232,10 @@ description: Use for any change to the AI activity-card feature (the draft-card 
 **Goal:** Kane as the grader of nondeterministic LLM output. This is Weave's most distinctive use of Kane.
 
 1. **Write the test first**, before the guard exists: `Tests/Kane/ai/card_never_leaks_reason_test.md`. Seed Alice's extension with the private reason **"chemistry test anxiety"**. Steps: tap Share with Group → wait for the AI draft → store the draft text as 'draft' → verify the draft does not contain "chemistry", "anxiety", or a paraphrase of the reason.
-2. Run it against the first version of `draft-card`, where the reason is in the model's context with only a prompt instruction not to use it. Run it **5 times** (fresh `kane-cli run` with the same objective, or `testmd run --author`) because output varies. If any run leaks, that's a real red result.
+2. Run it against the first version of `draft-card`, where the reason is in the model's context with only a prompt instruction not to use it. Run it exactly **5 times** as five fresh `kane-cli run` calls. Never use cached `testmd` replays for these privacy measurements. Start each call with Debug → Reset, then create a new private-reason seed so the app invokes OpenAI again. Store each generated draft text in that run's `final_state`. Log all five stored draft texts in `KANE_LOG.md`, with the run IDs, to prove that each call generated a fresh draft. If any run leaks, that's a real red result.
 3. Fix in layers: keep the reason out of the prompt entirely (send only minutes, time of day, and achievement), then add a server-side check that rejects drafts containing reason terms and regenerates.
-4. Rerun 5 times; all must pass. Commit with trailers and `Req: AI-01`.
-5. If all 5 first-version runs pass, don't fabricate a failure. Record "no leak observed in 5 runs" honestly, still ship the layered fix, and note that Kane gates the feature.
+4. Rerun with five more fresh `kane-cli run` calls. Reset and reseed before every call, store each new draft in `final_state`, and log all five texts and run IDs in `KANE_LOG.md`. All five must pass. Commit with trailers and `Req: AI-01`.
+5. If all 5 first-version runs pass, don't fabricate a failure. Record "no leak observed in 5 runs" honestly, still ship the layered fix, and note that Kane gates the feature. In the final readiness report, state the AI leak rate before and after the guard as leaked drafts out of five.
 
 ### Skill 7: kane-evidence
 
@@ -251,7 +251,8 @@ description: Use before a commit that fixes a Kane-found bug, before the demo, a
 3. For the final submission, merge the smoke and journey packs: `kane-cli evidence merge <packs...> --run-id weave-final`.
 4. Run `kane-cli cover` one last time and save the output.
 5. Maintain `evidence/EVIDENCE.md`: a table of requirement ID, test file, red pack (if any), green pack, what Kane caught. Below it, a **Not verified by Kane** list: ledger concurrency (SQL test), RLS (SQL test), real Screen Time shielding (physical device or unverified).
-6. Tell the user how to view a pack locally: `kane-cli evidence serve evidence/packs/<file>`.
+6. Before reporting readiness, refresh `kane-cli cover` and include exact counts for requirements proven and owed. Also report regressions caught before commit (an integer, including zero), median elapsed time from code change to verified commit, and AI leak rate before and after the guard as leaked drafts out of five. Cite the run IDs and five stored draft texts in `KANE_LOG.md`; cached replays do not count as fresh AI generations. If the five-run comparison is incomplete, report completed runs and mark its rate and readiness as pending instead of inventing a rate.
+7. Tell the user how to view a pack locally: `kane-cli evidence serve evidence/packs/<file>`.
 
 ## Step 3: write Requirements/acceptance-criteria.md
 
@@ -283,6 +284,7 @@ Build only what's in the core flow. Anything else is in the Optional tab, and yo
 **Architecture you must keep**
 
 - `ScreenTimeProvider` protocol with `MockScreenTimeProvider` (simulator, deterministic) and a stub `RealScreenTimeProvider`. The app reads the mock in DEBUG. Screen Time APIs don't work in the simulator, so the mock is how Kane tests the flow; say that in the README.
+- Do not add the Family Controls capability. Simulator builds need no Apple signing certificate or keys; the deterministic mock provider covers Screen Time in the simulator.
 - All credit changes happen in Postgres functions (`reserve_extension`, `confirm_extension`, `release_reservation`) using row locks, never in the client.
 - **Debug tab** (DEBUG only): buttons Reset, Sign in as Alice, Sign in as Bob, Seed: normal / low-balance / private-reason, Set usage at limit, Fail next activation. Kane tests start here, so they're deterministic.
 - `draft-card` Edge Function: receives the extension or achievement facts (never the reason), calls the OpenAI API with the key from Supabase secrets, returns a 1 to 2 sentence supportive card. Model name comes from an env var `OPENAI_MODEL`; pick a current small model from OpenAI's docs. Timeout 8 s with the AI-02 fallback.
@@ -329,6 +331,17 @@ Before telling the user the project is ready to submit, confirm every box and re
 - [ ] Repo public, all commits dated today
 - [ ] OpenAI called from `draft-card`; mentioned in the README
 - [ ] `evidence/EVIDENCE.md` and packs committed; tell the user which pack file to attach to the submission
+
+**Required readiness report values**
+
+When reporting readiness, include these measured values, even when a value is zero:
+
+- Regressions caught before commit: integer count, with references to the run or review entries in `KANE_LOG.md`.
+- Requirements proven and owed: exact proven/total counts and owed count from the final `kane-cli cover` output.
+- Median time from code change to verified commit: calculate from the recorded code-change and verification/commit times in `KANE_LOG.md`; state the sample count.
+- AI leak rate before and after the guard: leaked drafts out of five fresh `kane-cli run` calls for each phase. Every run starts with Reset and a new seed; cached replays do not count. Include the run IDs and all stored draft texts in `KANE_LOG.md`.
+
+If a five-run phase is incomplete, report how many fresh runs completed and mark its rate and readiness as pending. Never label an unrun draft as a non-leak.
 
 When everything is checked, give the user: the 3 strongest Kane catches in one line each (they'll open the demo video with these), and the path to the merged final pack.
 

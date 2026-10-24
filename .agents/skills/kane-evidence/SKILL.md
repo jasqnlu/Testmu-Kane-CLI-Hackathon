@@ -10,4 +10,5 @@ description: Use before a commit that fixes a Kane-found bug, before the demo, a
 3. For the final submission, merge the smoke and journey packs: `kane-cli evidence merge <packs...> --run-id weave-final`.
 4. Run `kane-cli cover` one last time and save the output.
 5. Maintain `evidence/EVIDENCE.md`: a table of requirement ID, test file, red pack (if any), green pack, what Kane caught. Below it, a **Not verified by Kane** list: ledger concurrency (SQL test), RLS (SQL test), real Screen Time shielding (physical device or unverified).
-6. Tell the user how to view a pack locally: `kane-cli evidence serve evidence/packs/<file>`.
+6. Before reporting readiness, refresh `kane-cli cover` and include exact counts for requirements proven and owed. Also report: regressions caught before commit (an integer, including zero); median elapsed time from code change to verified commit; and AI leak rate before and after the guard as leaked drafts out of five. Cite the run IDs and the five stored draft texts in `KANE_LOG.md`; do not count cached replays as fresh AI generations. If the five-run comparison is incomplete, report completed runs and mark readiness as pending instead of inventing a rate.
+7. Tell the user how to view a pack locally: `kane-cli evidence serve evidence/packs/<file>`.

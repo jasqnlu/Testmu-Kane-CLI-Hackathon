@@ -24,7 +24,7 @@
 - Journey (`journey_final.evidence`): pending.
 - Smoke suite (`smoke_final.evidence`): pending.
 - Merged submission pack (`weave-final`): pending.
-- M1 Kane coverage: 9 of 46 criteria proven (26% in the current run report); [validated pack](packs/M1_auth_groups_smoke.evidence). Historical M0 report: [coverage](coverage-m0.ndjson) and [gaps](coverage-gaps-m0.ndjson).
+- M1 Kane coverage: 9 of 46 criteria proven, 37 owed (25.9% risk-weighted coverage); [Kane cover report](coverage-m1.ndjson) and [validated pack](packs/M1_auth_groups_smoke.evidence). Historical M0 report: [coverage](coverage-m0.ndjson) and [gaps](coverage-gaps-m0.ndjson).
 
 Validate selected packs with `kane-cli evidence validate <path>` before indexing them. View a saved pack locally with `kane-cli evidence serve evidence/packs/<file>`.
 

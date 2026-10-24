@@ -31,9 +31,13 @@ M0 setup checks passed. M1 auth and group smoke passed after fixing a headless s
 
 | 2026-10-24 11:39–11:57 PDT | `Scripts/verify.sh smoke` (M1) | AUTH-01, GROUP-01 | PASSED / exit 0; testrun_done passed | verification | 6/6 passed, 0 failed/broken/skipped; 9 criteria proven. Pack validated at `evidence/packs/M1_auth_groups_smoke.evidence`. Next: M2 extensions, insufficient-credit red test first. |
 
-| 2026-10-24 11:35 PDT | Release simulator scan (first pass) | SAFE-01 | BUILD PASSED / scan failed | security review | No local credentials or Debug controls found, but the simulator session key identifier was present in the Release executable. Narrowed the sandbox session store to `DEBUG && targetEnvironment(simulator)` and reran the full suite. |
+| 2026-10-24 11:58 PDT | Release simulator scan (first pass) | SAFE-01 | BUILD PASSED / scan failed | security review | No local credentials or Debug controls found, but the simulator session key identifier was present in the Release executable. Narrowed the sandbox session store to `DEBUG && targetEnvironment(simulator)` and reran the full suite. |
 
 | 2026-10-24 11:59–12:07 PDT | `Scripts/verify.sh smoke` (post-guard fix) | AUTH-01, GROUP-01 | PASSED / exit 0; testrun_done passed | regression check | 6/6 passed, 0 failed/broken/skipped; 9 criteria proven. All six members now replayed. Updated pack at `evidence/packs/M1_auth_groups_smoke.evidence` validated. |
+
+| 2026-10-24 12:08 PDT | Release simulator build + scan (final) | SAFE-01 | PASSED / build exit 0, scan exit 0 | security review | No local account values, simulator-store marker, or Debug identifiers in the Release executable. Family Controls capability is absent. |
+
+| 2026-10-24 12:10 PDT | `./Scripts/run-demo.sh` | Demo launcher | PASSED / exit 0 | script verification | Built unsigned Debug app, booted iPhone 17 Pro (iOS 26.5), installed `com.jasonlu.weave`, and launched it with `simctl`. |
 
 For failures, record the failing step, expected versus observed outcome, screenshot path inside the evidence pack, and stored final-state values. Label honest red evidence as **feature-not-yet-implemented** or **found-by-exploration**. Record all attempts, including environment failures.
 
@@ -62,4 +66,14 @@ For failures, record the failing step, expected versus observed outcome, screens
 - Before UI verification, read-only review found delayed group fetch/refresh could restore a signed-out identity or stale group. Fixing session generation invalidation before the first M1 Kane run; this was code review, not a Kane catch.
 - OPENAI_API_KEY and OPENAI_MODEL absent from Supabase secret-name listing; user asked to set API key through dashboard, no key requested in chat.
 - M1 suite completed at 11:57 PDT: all six smoke cases passed; detailed criterion coverage is in the validated run pack. The initial simulator-store failure and simulator-only fix are recorded above.
-- A second six-case M1 suite passed at 12:07 PDT after restricting simulator storage to Debug. The deterministic session race checks passed 5/5. Release compile and final no-debug/no-fixture scan are completing before the M1 commit.
+- A second six-case M1 suite passed at 12:07 PDT after restricting simulator storage to Debug. The deterministic session race checks passed 5/5. Release compile and final no-debug/no-fixture scan passed.
+- M1 implementation committed as `ccd62d6` at 12:08:55 PDT, after the final 6/6 Kane run passed. Release compile/scan and the unsigned demo launcher both passed.
+
+## Readiness metric ledger
+
+Refresh this ledger after each milestone and use a final `kane-cli cover` result in the submission report.
+
+- Regressions or implementation issues caught before their commit: **4** in M1 (two stale-session/loading races in source review, one headless Keychain failure exposed during the first Kane attempt, and one simulator-session identifier found in the Release scan).
+- Requirements proven vs owed: **9/46 proven, 37 owed** in the latest M1 `kane-cli cover` report at `evidence/coverage-m1.ndjson`; refresh at final readiness.
+- Code change to verified commit: M1 first implementation file [migration](Supabase/migrations/202610240001_m1_auth_groups.sql) created at 11:26:06 PDT; verified commit `ccd62d6` at 12:08:55 PDT, **42m 49s** (one measured milestone so far).
+- AI leak rate: **0/0 runs completed before guard and 0/0 after guard**; the five fresh-run measurements are pending, so no leak rate is claimed.

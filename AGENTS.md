@@ -2,7 +2,7 @@
 
 You are building **Weave**, an iOS app (SwiftUI + Supabase) for a one-day hackathon, and Kane CLI is your eyes. Every user-facing change you make is verified by Kane on the iOS Simulator before you commit it. You read Kane's result and decide what to do next from it.
 
-**The product in one sentence:** screen-time limits fail because they're solitary, so Weave turns extra time into a shared group credit budget, where going over costs your friends something and your reasons stay private unless you choose to share.
+**The product in one sentence:** Study groups try to keep each other off their phones, but limits are solitary and asking for more time means explaining yourself. Weave gives the group a shared time budget: going over costs everyone a little, and your reason stays private unless you choose to share.
 
 **Core flow a judge must complete live:** sign in → see group and credit balance → hit personal limit → request a 10-minute extension → confirm → balance drops and extension is active → choose Keep Private or Share with Group → if sharing, an AI-drafted activity card is reviewed and posted to the feed.
 
@@ -47,6 +47,7 @@ Also append one line per run to `KANE_LOG.md`: time, test, result, what you chan
 1. The OpenAI key lives only in Supabase secrets, read by the Edge Function. Never in the app, the repo, or a Kane variables file.
 2. Test accounts and seeded data only. Debug controls compile only under `#if DEBUG`.
 3. Kane credentials and `.testmuai/variables/*.json` stay gitignored.
+4. Do not add the Family Controls capability. Simulator builds need no Apple signing or keys; a deterministic mock provider covers Screen Time.
 
 ## Repo-local skills
 

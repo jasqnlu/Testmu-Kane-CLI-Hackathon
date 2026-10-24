@@ -1,6 +1,12 @@
 # Weave
 
-Weave turns extra screen time into a shared group credit budget, where going over costs your friends something and your reasons stay private unless you choose to share.
+Study groups try to keep each other off their phones, but limits are solitary and asking for more time means explaining yourself. Weave gives the group a shared time budget: going over costs everyone a little, and your reason stays private unless you choose to share.
+
+**Private-exception demo flow:** a member hits their screen-time limit and asks for ten more minutes. The group budget covers the request, with a small cost shared by everyone. The member keeps their reason private by default, then may choose to share an editable activity card with the group.
+
+**Demo command:** `./Scripts/run-demo.sh` builds the unsigned simulator app, boots an iPhone simulator, installs Weave, and opens it. Walk through the private-exception flow above as features become available.
+
+**Test command:** `./Scripts/verify.sh smoke` runs the verified smoke tests serially through Kane.
 
 **Current status: M1 auth and group flows verified.** The app signs in through Supabase, shows the signed-in user's group and balance, and handles invalid credentials and group-fetch errors. Kane passed all six M1 smoke cases; the validated evidence pack is indexed in [evidence/EVIDENCE.md](evidence/EVIDENCE.md). Extensions, credit mutations, privacy, and AI are still in progress. This repository is not ready to submit. The implementation plan and acceptance criteria are in [Requirements](Requirements/acceptance-criteria.md).
 
@@ -27,25 +33,17 @@ Run the interactive login yourself. If the doctor reports missing simulator tool
 kane-cli config set-target simulator
 kane-cli config set-device-name "<exact iPhone name>"
 kane-cli config set-os-version "<exact OS version>"
-Scripts/build-sim.sh
-kane-cli config set-app ./builds/Weave.zip
 ```
 
-Build and verify from any working directory using the script path, or run this at the repository root:
+On Xcode 27, verification uses the supported headless Appium configuration documented in [HEADLESS.md](Tests/Kane/HEADLESS.md). Kane remains the UI verifier. Simulator builds do not use Apple signing or keys. Debug simulator tests store their session in the app sandbox; iOS device builds use Keychain. The app uses a deterministic mock Screen Time provider in the simulator and does not add Family Controls.
 
-```sh
-Scripts/verify.sh smoke
-```
-
-On Xcode 27, verification uses the supported headless Appium configuration documented in [HEADLESS.md](Tests/Kane/HEADLESS.md). Kane remains the UI verifier. The simulator stores its Kane test session in the app sandbox because the headless simulator build is ad hoc signed; device builds use Keychain.
-
-The build script runs:
+The demo build script calls the simulator build step:
 
 ```sh
 xcodebuild -scheme Weave -sdk iphonesimulator -configuration Debug -derivedDataPath build
 ```
 
-It packages `Weave.app` as `builds/Weave.zip`, the input format for Kane's simulator target. `Scripts/verify.sh smoke` seeds the normal owned fixture and runs M1 setup, auth, and group tests serially. Later features are not included until their milestones are verified.
+`Scripts/build-sim.sh` also packages `Weave.app` as `builds/Weave.zip`, the input format for Kane's simulator target. `./Scripts/verify.sh smoke` seeds the normal owned fixture and runs M1 setup, auth, and group tests serially. Later features are not included until their milestones are verified.
 
 ## Kane verification
 
