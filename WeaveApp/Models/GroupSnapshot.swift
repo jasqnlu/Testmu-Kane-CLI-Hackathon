@@ -6,6 +6,22 @@ struct GroupSnapshot: Decodable {
     let groupName: String
     let balance: Int
     let members: [GroupMember]
+    var activeExtension: ActiveExtension? = nil
+}
+
+struct ExtensionQuote: Decodable, Identifiable {
+    let minutes: Int
+    let cost: Int
+    let balance: Int
+    var id: Int { minutes }
+}
+
+struct ActiveExtension: Decodable {
+    let id: UUID
+    let minutes: Int
+    let expiresAt: TimeInterval
+
+    var expiryDate: Date { Date(timeIntervalSince1970: expiresAt) }
 }
 
 struct GroupMember: Decodable, Identifiable {

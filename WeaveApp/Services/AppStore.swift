@@ -10,6 +10,10 @@ final class AppStore: ObservableObject {
     @Published private(set) var isRestoring = true
     @Published var authError: String?
     @Published var groupError: String?
+    @Published private(set) var extensionQuote: ExtensionQuote?
+    @Published var extensionError: String?
+    @Published private(set) var isExtensionBusy = false
+    @Published var isShowingExtensionQuote = false
     @Published var selectedTab = 0
     private let backend: BackendServing
     private let sessionStorage: SessionStoring
@@ -42,6 +46,9 @@ final class AppStore: ObservableObject {
         isBusy = false
         isGroupLoading = false
         isRestoring = false
+        isExtensionBusy = false
+        extensionQuote = nil
+        isShowingExtensionQuote = false
         return sessionGeneration
     }
 
@@ -145,8 +152,56 @@ final class AppStore: ObservableObject {
         }
     }
 
+    func requestExtension(minutes: Int = 10) async -> Bool {
+        guard let signedIn = session, group != nil, !isExtensionBusy else { return false }
+        let generation = sessionGeneration
+        isExtensionBusy = true
+        extensionError = nil
+        defer { if generation == sessionGeneration { isExtensionBusy = false } }
+        do {
+            let quote = try await backend.extensionQuote(signedIn, minutes: minutes)
+            guard generation == sessionGeneration else { return false }
+            extensionQuote = quote
+            return true
+        } catch {
+            guard generation == sessionGeneration else { return false }
+            extensionQuote = nil
+            extensionError = userMessage(error, fallback: "Couldn't check your group balance. Please try again.")
+            return false
+        }
+    }
+
+    func confirmExtension() async {
+        guard let signedIn = session, let quote = extensionQuote, !isExtensionBusy else { return }
+        let generation = sessionGeneration
+        isExtensionBusy = true
+        extensionError = nil
+        defer { if generation == sessionGeneration { isExtensionBusy = false } }
+        do {
+            let updated = try await backend.confirmExtension(signedIn, minutes: quote.minutes)
+            guard generation == sessionGeneration else { return }
+            group = updated
+            extensionQuote = nil
+            isShowingExtensionQuote = false
+            do {
+                try await screenTime.activateExtension(minutes: quote.minutes)
+            } catch {
+                guard generation == sessionGeneration else { return }
+                extensionError = userMessage(error, fallback: "Your group time was approved, but this device couldn't apply it.")
+            }
+        } catch {
+            guard generation == sessionGeneration else { return }
+            extensionError = userMessage(error, fallback: "Couldn't start your extension. Please try again.")
+        }
+    }
+
+    func dismissExtensionQuote() {
+        extensionQuote = nil
+        isShowingExtensionQuote = false
+    }
+
     func signOut() async {
-        guard !isBusy else { return }
+        guard !isBusy, !isExtensionBusy else { return }
         let saved = session
         let generation = invalidateSessionWork()
         isBusy = true
@@ -157,6 +212,8 @@ final class AppStore: ObservableObject {
             session = nil
             group = nil
             groupError = nil
+            extensionQuote = nil
+            extensionError = nil
             authError = nil
             selectedTab = 0
             if let saved { try await backend.signOut(saved) }
@@ -173,7 +230,7 @@ final class AppStore: ObservableObject {
 
     #if DEBUG
     func debugReset() {
-        guard !isBusy else { return }
+        guard !isBusy, !isExtensionBusy else { return }
         invalidateSessionWork()
         do {
             try sessionStorage.clear()
@@ -181,6 +238,8 @@ final class AppStore: ObservableObject {
             group = nil
             authError = nil
             groupError = nil
+            extensionQuote = nil
+            extensionError = nil
             failNextSignIn = false
             failNextGroupFetch = false
             (screenTime as? MockScreenTimeProvider)?.reset()
@@ -199,7 +258,7 @@ final class AppStore: ObservableObject {
     }
 
     func debugSeedNormal() async {
-        guard !isBusy else { return }
+        guard !isBusy, !isExtensionBusy else { return }
         guard let saved = session else {
             debugNotice = "Sign in as a test user before seeding the group."
             return
@@ -217,6 +276,33 @@ final class AppStore: ObservableObject {
             group = result
             groupError = nil
             debugNotice = "Seed: normal complete. Group restored to 40 credits."
+        } catch {
+            guard generation == sessionGeneration else { return }
+            debugNotice = userMessage(error, fallback: "Couldn't seed the group. Try again.")
+        }
+    }
+
+    func debugSeedLowBalance() async {
+        guard !isBusy, !isExtensionBusy else { return }
+        guard let saved = session else {
+            debugNotice = "Sign in as a test user before seeding the group."
+            return
+        }
+        let generation = sessionGeneration
+        isBusy = true
+        defer { if generation == sessionGeneration { isBusy = false } }
+        do {
+            let current = saved.needsRefresh ? try await backend.refresh(saved) : saved
+            guard generation == sessionGeneration else { return }
+            try sessionStorage.save(current)
+            session = current
+            let result = try await backend.seedLowBalance(current)
+            guard generation == sessionGeneration else { return }
+            group = result
+            groupError = nil
+            extensionQuote = nil
+            extensionError = nil
+            debugNotice = "Seed: low-balance complete. Group set to 5 credits."
         } catch {
             guard generation == sessionGeneration else { return }
             debugNotice = userMessage(error, fallback: "Couldn't seed the group. Try again.")

@@ -1,0 +1,26 @@
+{
+  "commit_id": "adfcb148-f6fe-409d-85e8-c58b0ddb00b5",
+  "test_id": "ee6dcea4-b3bf-457e-a735-f51dfdcf8502",
+  "testcase_id": "01M5QQ3RDVXC6XNT3Q9B7K98VT",
+  "project_id": "01M5P8CE37CJWXR7V5N86YABJR",
+  "folder_id": "01M5P8CEMKND2NRKAJ5DF3PR9Q",
+  "org_id": "3387873",
+  "session_name": "confirm-cost-then-activate-ten-minutes-at-thirty-credits",
+  "executions": [
+    {
+      "execution_id": "514b88c5-78d9-46e4-a8f0-7fdfc30c4209",
+      "run_kind": "author",
+      "status": "passed",
+      "valid": true,
+      "uploaded": false,
+      "at": "2026-10-24T19:55:48.161Z"
+    },
+    {
+      "execution_id": "4c458feb-6661-4c7e-b568-be7b4b8eb2ab",
+      "run_kind": "replay",
+      "status": "passed",
+      "at": "2026-10-24T19:59:28.221Z",
+      "uploaded": true
+    }
+  ]
+}

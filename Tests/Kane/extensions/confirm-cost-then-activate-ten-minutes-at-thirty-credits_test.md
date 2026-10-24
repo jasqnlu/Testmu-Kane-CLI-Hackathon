@@ -1,7 +1,7 @@
 ---
 assurance:
   id: t-8
-  base: sha256:fa0de8c824b9de064600289e950a27712e7cfd0dd7af20597e3b2024324074ba
+  base: sha256:9466116a84914bd9cdbe5f3929bba0cc0a4d051d86bcf493875cc52b5514ba22
 target: simulator
 app: ../../../builds/Weave.zip
 device_name: iPhone 17 Pro

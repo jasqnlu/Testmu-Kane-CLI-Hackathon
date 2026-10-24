@@ -1,0 +1,18 @@
+{
+  "test_id": "f569922a-dd2c-48c3-8dff-5bb157f30de3",
+  "project_id": "01M5P8CE37CJWXR7V5N86YABJR",
+  "folder_id": "01M5P8CEMKND2NRKAJ5DF3PR9Q",
+  "org_id": "3387873",
+  "session_name": "reject-a-ten-minute-request-at-five-credits",
+  "commit_id": "1aa37404-78de-403b-82ce-1cc590c72691",
+  "testcase_id": "01M5QPWZRHD76EEJBA6R3G9Y01",
+  "executions": [
+    {
+      "execution_id": "822bbbbe-eed0-41b7-a89e-5699927ef2ca",
+      "run_kind": "author",
+      "status": "passed",
+      "valid": true,
+      "at": "2026-10-24T19:44:11.278Z"
+    }
+  ]
+}

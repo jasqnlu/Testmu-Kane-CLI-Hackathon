@@ -1,0 +1,25 @@
+{
+  "test_id": "71d08a58-1b14-4e7a-aed1-484fdd92a34b",
+  "project_id": "01M5P8CE37CJWXR7V5N86YABJR",
+  "folder_id": "01M5P8CEMKND2NRKAJ5DF3PR9Q",
+  "org_id": "3387873",
+  "session_name": "cancel-and-dismiss-without-activating-or-spending",
+  "commit_id": "342a219f-fd64-47fd-96fa-481c2d46445f",
+  "testcase_id": "01M5QQQQE1GEMDF7XSZZW9AWPQ",
+  "executions": [
+    {
+      "execution_id": "eb1fe254-26e6-4464-9202-bb82c9ed7027",
+      "run_kind": "author",
+      "status": "passed",
+      "valid": true,
+      "at": "2026-10-24T19:59:10.952Z"
+    },
+    {
+      "execution_id": "4c458feb-6661-4c7e-b568-be7b4b8eb2ab",
+      "run_kind": "author",
+      "status": "passed",
+      "at": "2026-10-24T19:59:28.217Z",
+      "uploaded": true
+    }
+  ]
+}

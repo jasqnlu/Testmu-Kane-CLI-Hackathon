@@ -18,8 +18,8 @@ struct DebugView: View {
                 Section("Server scenarios") {
                     Button("Seed: normal") { Task { await store.debugSeedNormal() } }
                         .accessibilityIdentifier("debug.seedNormal")
-                    Button("Seed: low-balance — unavailable until M2") {}
-                        .disabled(true)
+                    Button("Seed: low-balance") { Task { await store.debugSeedLowBalance() } }
+                        .accessibilityIdentifier("debug.seedLowBalance")
                     Button("Seed: private-reason — unavailable until M4") {}
                         .disabled(true)
                 }
@@ -39,7 +39,7 @@ struct DebugView: View {
                     Section("Status") { Text(notice).accessibilityIdentifier("debug.status") }
                 }
             }
-            .disabled(store.isBusy || store.isGroupLoading)
+            .disabled(store.isBusy || store.isGroupLoading || store.isExtensionBusy)
             .navigationTitle("Debug")
             .scrollContentBackground(.hidden)
             .background(WeaveStyle.cream)

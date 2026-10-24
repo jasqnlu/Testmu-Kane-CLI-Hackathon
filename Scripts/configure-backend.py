@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Provision only Weave's owned M1 fixtures; never print credentials or key material."""
+"""Provision only Weave's owned fixtures; never print credentials or key material."""
 import json
 import os
 from pathlib import Path
@@ -98,7 +98,8 @@ def configure():
         'expected_user_name': ('Alice', False), 'bob_email': (accounts['bob']['email'], True),
         'bob_password': (accounts['bob']['password'], True), 'incorrect_password': (secrets.token_urlsafe(30), True),
         'unrecognized_email': ('missing-user@weave.test', True),
-        'balance_40_fixture': ('In the Debug tab tap Seed: normal, then Set usage at limit.', False)}
+        'balance_40_fixture': ('In the Debug tab tap Seed: normal, then Set usage at limit.', False),
+        'balance_5_fixture': ('In the Debug tab tap Seed: low-balance, then Set usage at limit.', False)}
     for name, (value, secret) in values.items():
         variables.setdefault(name, {})
         variables[name].update({'value': value, 'secret': secret})
@@ -144,15 +145,33 @@ commit;""")
     print('Normal fixture verified through authenticated RPC: Study, Alice/Bob/Charlie, 40 credits.')
 
 
+def seed_low_balance(accounts=None, anon=None):
+    if accounts is None:
+        accounts = json.loads((ROOT / 'Config/TestAccounts.json').read_text())
+    if anon is None:
+        anon = json.loads((ROOT / 'Config/Backend.json').read_text())['anonKey']
+    alice = accounts['alice']
+    session = api('/auth/v1/token?grant_type=password', anon, {'email': alice['email'], 'password': alice['password']})
+    result = api('/rest/v1/rpc/debug_seed_low_balance', anon, {}, bearer=session['access_token'])
+    if result.get('balance') != 5 or result.get('group_name') != 'Study':
+        raise RuntimeError('Seed snapshot did not match the low-balance fixture; no success claimed.')
+    summary = {'project_ref': PROJECT, 'scenario': 'low-balance', 'group_name': result['group_name'],
+        'balance': result['balance'], 'verification': 'authenticated debug_seed_low_balance RPC; not a Kane UI pass'}
+    (ROOT / 'evidence/backend-m2-low-seed.json').write_text(json.dumps(summary, indent=2) + '\n')
+    print('Low-balance fixture verified through authenticated RPC: Study, 5 credits.')
+
+
 if __name__ == '__main__':
     os.umask(0o077)
     try:
         if sys.argv[1:] == ['--seed-normal']:
             seed_normal()
+        elif sys.argv[1:] == ['--seed-low']:
+            seed_low_balance()
         elif not sys.argv[1:]:
             configure()
         else:
-            raise RuntimeError('Usage: Scripts/configure-backend.py [--seed-normal]')
+            raise RuntimeError('Usage: Scripts/configure-backend.py [--seed-normal|--seed-low]')
     except (RuntimeError, OSError, ValueError, KeyError) as error:
         print(f'Backend setup stopped: {error}', file=sys.stderr)
         sys.exit(2)

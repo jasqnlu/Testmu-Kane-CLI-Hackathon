@@ -1,15 +1,15 @@
 # Weave evidence index
 
-**Submission status: not ready.** M1 auth/group and the existing M3 double-tap behavior have validated Kane evidence; RECOV-01 has a pre-guard red awaiting its fix and green rerun. Remaining product flows and submission gates are open. Empty cells below mean unverified, not passing.
+**Submission status: not ready.** M1 auth/group, M2 extension flows, and the existing M3 double-tap behavior have validated Kane evidence; RECOV-01 has a pre-guard red awaiting its fix and green rerun. The M2 pre-guard CREDIT-02 red is missing because the server guard was already present in the starting worktree. Remaining product flows and submission gates are open. Empty cells below mean unverified, not passing.
 
 | Requirement | Test file | Red pack | Green pack | What Kane caught |
 | --- | --- | --- | --- | --- |
 | AUTH-01 | Tests/Kane/auth/existing-user-sees-their-name-after-sign-in_test.md; Tests/Kane/auth/reject-invalid-credentials-without-exposing-a-group_test.md; Tests/Kane/auth/keep-a-user-signed-out-when-sign-in-fails_test.md | — | [M1_auth_groups_smoke.evidence](packs/M1_auth_groups_smoke.evidence) | Kane passed valid sign-in, invalid credentials, and forced sign-in failure; user stayed signed out on errors. |
 | GROUP-01 | Tests/Kane/groups/show-alice-s-study-members-and-40-credit-balance_test.md; Tests/Kane/groups/show-error-instead-of-fetched-data-when-study-group-fetch_test.md | — | [M1_auth_groups_smoke.evidence](packs/M1_auth_groups_smoke.evidence) | Kane passed member/balance display and the fetch-error state with no fetched balance or members. |
 | CREDIT-01 | Pending | — | — | Not yet verified |
-| CREDIT-02 | Pending | — | — | Not yet verified |
-| EXT-01 | Pending | — | — | Not yet verified |
-| EXT-02 | Pending | — | — | Not yet verified |
+| CREDIT-02 | [reject-a-ten-minute-request-at-five-credits_test.md](../Tests/Kane/credits/reject-a-ten-minute-request-at-five-credits_test.md) | — | [CREDIT-02_green_20261024.evidence](packs/CREDIT-02_green_20261024.evidence) | Kane confirmed a 10-minute request is rejected at 5 credits and the balance stays 5; no pre-guard red was available in the starting worktree. |
+| EXT-01 | [cancel-and-dismiss-without-activating-or-spending_test.md](../Tests/Kane/extensions/cancel-and-dismiss-without-activating-or-spending_test.md) | — | [M2_extensions_green_20261024.evidence](packs/M2_extensions_green_20261024.evidence) | Kane confirmed cancelling or dismissing the confirmation sheet leaves the 40-credit balance untouched. |
+| EXT-02 | [confirm-cost-then-activate-ten-minutes-at-thirty-credits_test.md](../Tests/Kane/extensions/confirm-cost-then-activate-ten-minutes-at-thirty-credits_test.md) | — | [M2_extensions_green_20261024.evidence](packs/M2_extensions_green_20261024.evidence) | Kane confirmed an explicit 10-credit confirmation leaves 30 credits and shows an active extension with an expiry. |
 | EXT-03 | [keep-the-balance-at-30-after-duplicate-confirmation_test.md](../Tests/Kane/extensions/keep-the-balance-at-30-after-duplicate-confirmation_test.md) | — | [EXT-03_preexisting_ui_guard_green_20261024.evidence](packs/EXT-03_preexisting_ui_guard_green_20261024.evidence) | Double-tap Confirm kept the balance at 30 on the existing M2 baseline, which already blocks confirmation while busy. |
 | RECOV-01 | [show-failure-and-restore-credits-after-failed-activation_test.md](../Tests/Kane/extensions/show-failure-and-restore-credits-after-failed-activation_test.md) | [RECOV-01_red_20261024.evidence](packs/RECOV-01_red_20261024.evidence) | Pending | Kane confirmed that failed mock activation left the group balance at 30 instead of restoring 40. |
 | PRIV-01 | Pending | — | — | Not yet verified |

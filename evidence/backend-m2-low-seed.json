@@ -1,0 +1,7 @@
+{
+  "project_ref": "wwlbaihtcyyfxoesyytr",
+  "scenario": "low-balance",
+  "group_name": "Study",
+  "balance": 5,
+  "verification": "authenticated debug_seed_low_balance RPC; not a Kane UI pass"
+}

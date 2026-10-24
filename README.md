@@ -81,4 +81,4 @@ Use seeded test accounts only. Keep credentials in ignored `.testmuai/variables/
 
 ## Repository history and submission gates
 
-Existing initial documentation commits are dated **October 23, 2026 Pacific**. Preserve that history. The October 24 “all code written today” gate needs organizer review against the actual code commits; do not rewrite dates or claim this gate has passed. The repository is confirmed public. A working product OpenAI call and a validated final Kane journey/smoke pack remain submission gates.
+The October 23, 2026 Pacific commits contain planning documents only; organizers confirmed that a pre-hackathon spec is allowed. All code was written on October 24, 2026 Pacific, and the “code written today” gate is **confirmed by organizers**. Preserve the existing commit history. The repository is confirmed public. A working product OpenAI call and a validated final Kane journey/smoke pack remain submission gates.

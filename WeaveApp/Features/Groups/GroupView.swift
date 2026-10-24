@@ -30,6 +30,38 @@ struct GroupView: View {
                         .padding(24)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(.white, in: RoundedRectangle(cornerRadius: 24))
+                        if let active = group.activeExtension {
+                            Label("Extension active, ends at \(expiryTime(active.expiryDate))",
+                                  systemImage: "hourglass")
+                                .font(.callout.weight(.semibold))
+                                .accessibilityIdentifier("extension.active")
+                        }
+                        if let error = store.extensionError {
+                            Text(error)
+                                .font(.callout)
+                                .foregroundStyle(.red)
+                                .accessibilityIdentifier("extension.error")
+                        }
+                        #if DEBUG
+                        if store.screenTime.isAtLimit && group.activeExtension == nil {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Label("Personal limit reached", systemImage: "hourglass")
+                                    .font(.callout.weight(.semibold))
+                                    .accessibilityIdentifier("usage.atLimit")
+                                Button("Request 10 minutes") {
+                                    Task {
+                                        if await store.requestExtension() { store.isShowingExtensionQuote = true }
+                                    }
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .disabled(store.isExtensionBusy)
+                                .accessibilityIdentifier("extension.request")
+                            }
+                            .padding(20)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(.white, in: RoundedRectangle(cornerRadius: 24))
+                        }
+                        #endif
                         VStack(alignment: .leading, spacing: 18) {
                             Text("Your people").font(.title2.weight(.semibold))
                             ForEach(group.members) { member in
@@ -45,13 +77,6 @@ struct GroupView: View {
                                 }
                             }
                         }
-                        #if DEBUG
-                        if store.screenTime.isAtLimit {
-                            Label("Personal limit reached", systemImage: "hourglass")
-                                .font(.callout)
-                                .accessibilityIdentifier("usage.atLimit")
-                        }
-                        #endif
                     } else if let error = store.groupError {
                         ContentUnavailableView {
                             Label("Couldn't load your group", systemImage: "wifi.exclamationmark")
@@ -77,8 +102,41 @@ struct GroupView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Sign out") { Task { await store.signOut() } }
-                        .disabled(store.isBusy || store.isGroupLoading)
+                        .disabled(store.isBusy || store.isGroupLoading || store.isExtensionBusy)
                         .accessibilityIdentifier("auth.signOut")
+                }
+            }
+            .sheet(isPresented: $store.isShowingExtensionQuote, onDismiss: store.dismissExtensionQuote) {
+                if let quote = store.extensionQuote {
+                    VStack(spacing: 22) {
+                        Text("A little more time")
+                            .font(.title2.weight(.semibold))
+                        Text("\(quote.minutes) minutes · \(quote.cost) credits")
+                            .font(.title3)
+                            .accessibilityIdentifier("extension.quote")
+                        Text("This comes from your group's shared time budget.")
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                        if let error = store.extensionError {
+                            Text(error)
+                                .foregroundStyle(.red)
+                                .accessibilityIdentifier("extension.error")
+                        }
+                        Button("Confirm") {
+                            Task {
+                                await store.confirmExtension()
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(store.isExtensionBusy)
+                        .accessibilityIdentifier("extension.confirm")
+                        Button("Cancel", role: .cancel) { store.isShowingExtensionQuote = false }
+                            .disabled(store.isExtensionBusy)
+                            .accessibilityIdentifier("extension.cancel")
+                    }
+                    .padding(28)
+                    .foregroundStyle(WeaveStyle.ink)
+                    .presentationDetents([.medium])
                 }
             }
             .refreshable { await store.loadGroup() }
@@ -88,5 +146,12 @@ struct GroupView: View {
                 }
             }
         }
+    }
+
+    private func expiryTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_GB")
+        formatter.dateFormat = "HH:mm"
+        return formatter.string(from: date)
     }
 }

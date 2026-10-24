@@ -5,8 +5,11 @@ protocol BackendServing {
     func refresh(_ session: AuthSession) async throws -> AuthSession
     func signOut(_ session: AuthSession) async throws
     func groupSnapshot(_ session: AuthSession) async throws -> GroupSnapshot
+    func extensionQuote(_ session: AuthSession, minutes: Int) async throws -> ExtensionQuote
+    func confirmExtension(_ session: AuthSession, minutes: Int) async throws -> GroupSnapshot
     #if DEBUG
     func resetNormal(_ session: AuthSession) async throws -> GroupSnapshot
+    func seedLowBalance(_ session: AuthSession) async throws -> GroupSnapshot
     #endif
 }
 
@@ -39,15 +42,32 @@ struct SupabaseService: BackendServing {
         return try decoder.decode(GroupSnapshot.self, from: data)
     }
 
+    func extensionQuote(_ session: AuthSession, minutes: Int) async throws -> ExtensionQuote {
+        let data = try await request("rest/v1/rpc/extension_quote", token: session.accessToken,
+                                     body: ["p_minutes": minutes])
+        return try decoder.decode(ExtensionQuote.self, from: data)
+    }
+
+    func confirmExtension(_ session: AuthSession, minutes: Int) async throws -> GroupSnapshot {
+        let data = try await request("rest/v1/rpc/confirm_extension", token: session.accessToken,
+                                     body: ["p_minutes": minutes])
+        return try decoder.decode(GroupSnapshot.self, from: data)
+    }
+
     #if DEBUG
     func resetNormal(_ session: AuthSession) async throws -> GroupSnapshot {
         let data = try await request("rest/v1/rpc/debug_reset_normal", token: session.accessToken)
         return try decoder.decode(GroupSnapshot.self, from: data)
     }
+
+    func seedLowBalance(_ session: AuthSession) async throws -> GroupSnapshot {
+        let data = try await request("rest/v1/rpc/debug_seed_low_balance", token: session.accessToken)
+        return try decoder.decode(GroupSnapshot.self, from: data)
+    }
     #endif
 
     private func request(_ path: String, query: [URLQueryItem] = [], token: String? = nil,
-                         body: [String: String] = [:]) async throws -> Data {
+                         body: [String: Any] = [:]) async throws -> Data {
         guard let base = URL(string: LocalConfiguration.url), base.scheme == "https",
               !LocalConfiguration.anonKey.isEmpty,
               var components = URLComponents(url: base.appendingPathComponent(path), resolvingAgainstBaseURL: false) else {
@@ -70,6 +90,7 @@ struct SupabaseService: BackendServing {
             if path.contains("auth/v1/token"), http.statusCode == 400 {
                 throw BackendError.signInRejected
             }
+            if message == "Not enough group credits" { throw BackendError.insufficientCredits }
             throw BackendError.rejected(message ?? "The request could not be completed. Please try again.")
         }
         return data
@@ -79,7 +100,7 @@ struct SupabaseService: BackendServing {
 private struct ServiceMessage: Decodable { let message: String? }
 
 enum BackendError: LocalizedError {
-    case configuration, unavailable, unauthorized, signInRejected
+    case configuration, unavailable, unauthorized, signInRejected, insufficientCredits
     case rejected(String)
 
     var errorDescription: String? {
@@ -88,6 +109,7 @@ enum BackendError: LocalizedError {
         case .unavailable: "Couldn't connect. Please try again."
         case .unauthorized: "Your sign-in expired. Please sign in again."
         case .signInRejected: "Email or password wasn't accepted. Please try again."
+        case .insufficientCredits: "Not enough group credits"
         case .rejected: "Couldn't complete the request. Please try again."
         }
     }
