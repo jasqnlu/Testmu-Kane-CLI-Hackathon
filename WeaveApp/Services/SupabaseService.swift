@@ -5,12 +5,15 @@ protocol BackendServing {
     func refresh(_ session: AuthSession) async throws -> AuthSession
     func signOut(_ session: AuthSession) async throws
     func groupSnapshot(_ session: AuthSession) async throws -> GroupSnapshot
+    func groupFeed(_ session: AuthSession) async throws -> [FeedCard]
     func extensionQuote(_ session: AuthSession, minutes: Int) async throws -> ExtensionQuote
     func confirmExtension(_ session: AuthSession, minutes: Int) async throws -> GroupSnapshot
     func releaseReservation(_ session: AuthSession, extensionID: UUID) async throws -> GroupSnapshot
+    func chooseExtensionSharing(_ session: AuthSession, extensionID: UUID, reason: String, share: Bool, body: String?) async throws -> GroupSnapshot
     #if DEBUG
     func resetNormal(_ session: AuthSession) async throws -> GroupSnapshot
     func seedLowBalance(_ session: AuthSession) async throws -> GroupSnapshot
+    func seedPrivateReason(_ session: AuthSession) async throws -> GroupSnapshot
     #endif
 }
 
@@ -43,6 +46,11 @@ struct SupabaseService: BackendServing {
         return try decoder.decode(GroupSnapshot.self, from: data)
     }
 
+    func groupFeed(_ session: AuthSession) async throws -> [FeedCard] {
+        let data = try await request("rest/v1/rpc/group_feed", token: session.accessToken, body: [:])
+        return try decoder.decode([FeedCard].self, from: data)
+    }
+
     func extensionQuote(_ session: AuthSession, minutes: Int) async throws -> ExtensionQuote {
         let data = try await request("rest/v1/rpc/extension_quote", token: session.accessToken,
                                      body: ["p_minutes": minutes])
@@ -61,6 +69,15 @@ struct SupabaseService: BackendServing {
         return try decoder.decode(GroupSnapshot.self, from: data)
     }
 
+    func chooseExtensionSharing(_ session: AuthSession, extensionID: UUID, reason: String, share: Bool, body: String?) async throws -> GroupSnapshot {
+        let data = try await request("rest/v1/rpc/choose_extension_sharing", token: session.accessToken,
+                                     body: ["p_extension_id": extensionID.uuidString,
+                                            "p_reason": reason,
+                                            "p_share": share,
+                                            "p_body": body as Any? ?? NSNull()])
+        return try decoder.decode(GroupSnapshot.self, from: data)
+    }
+
     #if DEBUG
     func resetNormal(_ session: AuthSession) async throws -> GroupSnapshot {
         let data = try await request("rest/v1/rpc/debug_reset_normal", token: session.accessToken)
@@ -69,6 +86,11 @@ struct SupabaseService: BackendServing {
 
     func seedLowBalance(_ session: AuthSession) async throws -> GroupSnapshot {
         let data = try await request("rest/v1/rpc/debug_seed_low_balance", token: session.accessToken)
+        return try decoder.decode(GroupSnapshot.self, from: data)
+    }
+
+    func seedPrivateReason(_ session: AuthSession) async throws -> GroupSnapshot {
+        let data = try await request("rest/v1/rpc/debug_seed_private_reason", token: session.accessToken, body: [:])
         return try decoder.decode(GroupSnapshot.self, from: data)
     }
     #endif

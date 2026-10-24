@@ -161,6 +161,23 @@ def seed_low_balance(accounts=None, anon=None):
     print('Low-balance fixture verified through authenticated RPC: Study, 5 credits.')
 
 
+def seed_private_reason(accounts=None, anon=None):
+    if accounts is None:
+        accounts = json.loads((ROOT / 'Config/TestAccounts.json').read_text())
+    if anon is None:
+        anon = json.loads((ROOT / 'Config/Backend.json').read_text())['anonKey']
+    alice = accounts['alice']
+    session = api('/auth/v1/token?grant_type=password', anon, {'email': alice['email'], 'password': alice['password']})
+    result = api('/rest/v1/rpc/debug_seed_private_reason', anon, {}, bearer=session['access_token'])
+    completed = result.get('completed_extension') or {}
+    if result.get('balance') != 40 or completed.get('reason') != 'chemistry test anxiety':
+        raise RuntimeError('Private-reason fixture did not match the owned test scenario; no success claimed.')
+    summary = {'project_ref': PROJECT, 'scenario': 'private-reason', 'group_name': result['group_name'],
+        'balance': result['balance'], 'verification': 'authenticated debug_seed_private_reason RPC; not a Kane UI pass'}
+    (ROOT / 'evidence/backend-m4-private-seed.json').write_text(json.dumps(summary, indent=2) + '\n')
+    print('Private-reason fixture verified through authenticated RPC for the owned Study test group.')
+
+
 if __name__ == '__main__':
     os.umask(0o077)
     try:
@@ -168,10 +185,12 @@ if __name__ == '__main__':
             seed_normal()
         elif sys.argv[1:] == ['--seed-low']:
             seed_low_balance()
+        elif sys.argv[1:] == ['--seed-private-reason']:
+            seed_private_reason()
         elif not sys.argv[1:]:
             configure()
         else:
-            raise RuntimeError('Usage: Scripts/configure-backend.py [--seed-normal|--seed-low]')
+            raise RuntimeError('Usage: Scripts/configure-backend.py [--seed-normal|--seed-low|--seed-private-reason]')
     except (RuntimeError, OSError, ValueError, KeyError) as error:
         print(f'Backend setup stopped: {error}', file=sys.stderr)
         sys.exit(2)

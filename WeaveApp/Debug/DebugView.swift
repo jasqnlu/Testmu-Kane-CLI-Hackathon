@@ -20,8 +20,8 @@ struct DebugView: View {
                         .accessibilityIdentifier("debug.seedNormal")
                     Button("Seed: low-balance") { Task { await store.debugSeedLowBalance() } }
                         .accessibilityIdentifier("debug.seedLowBalance")
-                    Button("Seed: private-reason — unavailable until M4") {}
-                        .disabled(true)
+                    Button("Seed: private-reason") { Task { await store.debugSeedPrivateReason() } }
+                        .accessibilityIdentifier("debug.seedPrivateReason")
                 }
                 Section("Mock Screen Time") {
                     Button("Set usage at limit") { store.debugSetAtLimit() }

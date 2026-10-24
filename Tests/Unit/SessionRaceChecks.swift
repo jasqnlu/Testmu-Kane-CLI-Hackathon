@@ -61,6 +61,7 @@ private actor ControlledBackend: BackendServing {
         }
         return Self.group(session.accessToken.contains("bob") ? "Bob" : "Alice")
     }
+    func groupFeed(_ session: AuthSession) async throws -> [FeedCard] { [] }
     func extensionQuote(_ session: AuthSession, minutes: Int) async throws -> ExtensionQuote {
         ExtensionQuote(minutes: minutes, cost: minutes, balance: 40)
     }
@@ -70,9 +71,13 @@ private actor ControlledBackend: BackendServing {
     func releaseReservation(_ session: AuthSession, extensionID: UUID) async throws -> GroupSnapshot {
         Self.group(session.accessToken.contains("bob") ? "Bob" : "Alice")
     }
+    func chooseExtensionSharing(_ session: AuthSession, extensionID: UUID, reason: String, share: Bool, body: String?) async throws -> GroupSnapshot {
+        Self.group(session.accessToken.contains("bob") ? "Bob" : "Alice")
+    }
     #if DEBUG
     func resetNormal(_ session: AuthSession) async throws -> GroupSnapshot { try await groupSnapshot(session) }
     func seedLowBalance(_ session: AuthSession) async throws -> GroupSnapshot { try await groupSnapshot(session) }
+    func seedPrivateReason(_ session: AuthSession) async throws -> GroupSnapshot { try await groupSnapshot(session) }
     #endif
     static func session(_ name: String, expired: Bool = false) -> AuthSession {
         AuthSession(accessToken: name, refreshToken: name + "-refresh", expiresAt: expired ? 0 : Date().timeIntervalSince1970 + 3600, expiresIn: 3600)

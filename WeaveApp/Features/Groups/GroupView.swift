@@ -31,10 +31,24 @@ struct GroupView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(.white, in: RoundedRectangle(cornerRadius: 24))
                         if let active = group.activeExtension {
-                            Label("Extension active, ends at \(expiryTime(active.expiryDate))",
-                                  systemImage: "hourglass")
-                                .font(.callout.weight(.semibold))
-                                .accessibilityIdentifier("extension.active")
+                            VStack(alignment: .leading, spacing: 12) {
+                                Label("Extension active, ends at \(expiryTime(active.expiryDate))",
+                                      systemImage: "hourglass")
+                                    .font(.callout.weight(.semibold))
+                                    .accessibilityIdentifier("extension.active")
+                                Button("Choose how to share") { store.beginSharingChoice() }
+                                    .accessibilityIdentifier("privacy.chooseSharing")
+                            }
+                        }
+                        if let completed = group.completedExtension {
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("Your completed extension").font(.headline)
+                                Text("10 minutes").accessibilityIdentifier("extension.completed")
+                                Text("Private reason saved").font(.subheadline).foregroundStyle(.secondary)
+                            }
+                            .padding(18)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(.white, in: RoundedRectangle(cornerRadius: 20))
                         }
                         if let error = store.extensionError {
                             Text(error)
@@ -74,6 +88,27 @@ struct GroupView: View {
                                     if member.name == group.userName {
                                         Text("You").font(.subheadline).foregroundStyle(.secondary)
                                     }
+                                }
+                            }
+                        }
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Group activity").font(.title2.weight(.semibold))
+                                .accessibilityIdentifier("feed.heading")
+                            if store.feed.isEmpty {
+                                Text("No shared activity yet.")
+                                    .foregroundStyle(.secondary)
+                                    .accessibilityIdentifier("feed.empty")
+                            } else {
+                                ForEach(store.feed) { card in
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Text(card.userName).font(.headline)
+                                        Text(card.body).accessibilityIdentifier("feed.card.body")
+                                    }
+                                    .accessibilityElement(children: .contain)
+                                    .accessibilityIdentifier("feed.card")
+                                    .padding(16)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .background(.white, in: RoundedRectangle(cornerRadius: 18))
                                 }
                             }
                         }
@@ -138,6 +173,47 @@ struct GroupView: View {
                     .foregroundStyle(WeaveStyle.ink)
                     .presentationDetents([.medium])
                 }
+            }
+            .sheet(isPresented: $store.isShowingSharingChoice) {
+                VStack(spacing: 18) {
+                    Text("Your reason stays private").font(.title2.weight(.semibold))
+                    TextField("What brought you to your phone?", text: $store.privateReasonDraft, axis: .vertical)
+                        .lineLimit(2...4)
+                        .textFieldStyle(.roundedBorder)
+                        .accessibilityIdentifier("privacy.reason")
+                    Text("Choose whether your group sees an activity card.")
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                    if let error = store.shareError {
+                        Text(error).foregroundStyle(.red).accessibilityIdentifier("privacy.error")
+                    }
+                    Button("Keep Private") { Task { await store.keepExtensionPrivate() } }
+                        .buttonStyle(.bordered)
+                        .accessibilityIdentifier("privacy.keepPrivate")
+                    Button("Share with Group") { store.openShareEditor() }
+                        .buttonStyle(.borderedProminent)
+                        .accessibilityIdentifier("privacy.shareGroup")
+                }
+                .padding(28)
+                .presentationDetents([.medium])
+            }
+            .sheet(isPresented: $store.isShowingShareEditor) {
+                VStack(spacing: 16) {
+                    Text("Review your group card").font(.title2.weight(.semibold))
+                    TextEditor(text: $store.shareDraft)
+                        .frame(minHeight: 120)
+                        .accessibilityIdentifier("share.draft")
+                    if let error = store.shareError {
+                        Text(error).foregroundStyle(.red).accessibilityIdentifier("share.error")
+                    }
+                    Button("Post") { Task { await store.postSharedExtension() } }
+                        .buttonStyle(.borderedProminent)
+                        .accessibilityIdentifier("share.post")
+                    Button("Cancel", role: .cancel) { store.cancelShareEditor() }
+                        .accessibilityIdentifier("share.cancel")
+                }
+                .padding(24)
+                .presentationDetents([.medium, .large])
             }
             .refreshable { await store.loadGroup() }
             .onAppear {

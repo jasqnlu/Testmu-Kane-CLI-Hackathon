@@ -15,6 +15,13 @@ final class AppStore: ObservableObject {
     @Published private(set) var isExtensionBusy = false
     @Published var isShowingExtensionQuote = false
     @Published var selectedTab = 0
+    @Published private(set) var feed: [FeedCard] = []
+    @Published var shareDraft = ""
+    @Published var privateReasonDraft = ""
+    @Published var shareError: String?
+    @Published var isShowingSharingChoice = false
+    @Published var isShowingShareEditor = false
+    private var sharingExtensionID: UUID?
     private let backend: BackendServing
     private let sessionStorage: SessionStoring
     private var sessionGeneration = 0
@@ -69,6 +76,7 @@ final class AppStore: ObservableObject {
             try? sessionStorage.clear()
             session = nil
             group = nil
+            feed = []
             authError = "Your saved sign-in couldn't be restored. Please sign in again."
         }
     }
@@ -104,6 +112,7 @@ final class AppStore: ObservableObject {
             guard generation == sessionGeneration else { return }
             session = nil
             group = nil
+            feed = []
             authError = userMessage(error, fallback: "Couldn't sign in. Check your connection and try again.")
         }
     }
@@ -140,6 +149,7 @@ final class AppStore: ObservableObject {
             let result = try await backend.groupSnapshot(current)
             guard generation == sessionGeneration, groupRequestID == requestID else { return }
             group = result
+            await loadFeed(for: current, generation: generation)
         } catch BackendError.unauthorized {
             guard generation == sessionGeneration, groupRequestID == requestID else { return }
             invalidateSessionWork()
@@ -212,6 +222,75 @@ final class AppStore: ObservableObject {
         isShowingExtensionQuote = false
     }
 
+    func loadFeed() async {
+        guard let signedIn = session else { return }
+        await loadFeed(for: signedIn, generation: sessionGeneration)
+    }
+
+    private func loadFeed(for signedIn: AuthSession, generation: Int) async {
+        do {
+            let value = try await backend.groupFeed(signedIn)
+            guard generation == sessionGeneration else { return }
+            feed = value
+        } catch {
+            guard generation == sessionGeneration else { return }
+            feed = []
+        }
+    }
+
+    func beginSharingChoice() {
+        guard let group else { return }
+        sharingExtensionID = group.completedExtension?.id ?? group.activeExtension?.id
+        guard sharingExtensionID != nil else { return }
+        privateReasonDraft = group.completedExtension?.reason ?? ""
+        shareError = nil
+        isShowingSharingChoice = true
+    }
+
+    func keepExtensionPrivate() async {
+        guard let signedIn = session, let extensionID = sharingExtensionID,
+              !privateReasonDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        do {
+            let updated = try await backend.chooseExtensionSharing(signedIn, extensionID: extensionID,
+                                                                    reason: privateReasonDraft, share: false, body: nil)
+            group = updated
+            await loadFeed()
+            isShowingSharingChoice = false
+            sharingExtensionID = nil
+            shareError = nil
+        } catch {
+            shareError = userMessage(error, fallback: "Couldn't keep this reason private. Try again.")
+        }
+    }
+
+    func openShareEditor() {
+        guard let group, sharingExtensionID != nil else { return }
+        shareDraft = "\(group.userName) used 10 group minutes."
+        shareError = nil
+        isShowingSharingChoice = false
+        isShowingShareEditor = true
+    }
+
+    func cancelShareEditor() {
+        isShowingShareEditor = false
+        shareDraft = ""
+    }
+
+    func postSharedExtension() async {
+        guard let signedIn = session, let extensionID = sharingExtensionID else { return }
+        do {
+            let updated = try await backend.chooseExtensionSharing(signedIn, extensionID: extensionID,
+                                                                    reason: privateReasonDraft, share: true, body: shareDraft)
+            group = updated
+            await loadFeed()
+            isShowingShareEditor = false
+            sharingExtensionID = nil
+            shareError = nil
+        } catch {
+            shareError = userMessage(error, fallback: "Couldn't post this card. Try again.")
+        }
+    }
+
     func signOut() async {
         guard !isBusy, !isExtensionBusy else { return }
         let saved = session
@@ -223,6 +302,7 @@ final class AppStore: ObservableObject {
             try sessionStorage.clear()
             session = nil
             group = nil
+            feed = []
             groupError = nil
             extensionQuote = nil
             extensionError = nil
@@ -318,6 +398,30 @@ final class AppStore: ObservableObject {
         } catch {
             guard generation == sessionGeneration else { return }
             debugNotice = userMessage(error, fallback: "Couldn't seed the group. Try again.")
+        }
+    }
+
+    func debugSeedPrivateReason() async {
+        guard !isBusy, !isExtensionBusy, let saved = session else {
+            debugNotice = "Sign in as a test user before seeding a private reason."
+            return
+        }
+        let generation = sessionGeneration
+        isBusy = true
+        defer { if generation == sessionGeneration { isBusy = false } }
+        do {
+            let result = try await backend.seedPrivateReason(saved)
+            guard generation == sessionGeneration else { return }
+            group = result
+            sharingExtensionID = result.completedExtension?.id
+            privateReasonDraft = result.completedExtension?.reason ?? ""
+            await loadFeed(for: saved, generation: generation)
+            debugNotice = "Private-reason fixture ready. The stored reason is chemistry test anxiety."
+            isShowingSharingChoice = true
+            selectedTab = 0
+        } catch {
+            guard generation == sessionGeneration else { return }
+            debugNotice = userMessage(error, fallback: "Couldn't seed the private-reason fixture.")
         }
     }
 

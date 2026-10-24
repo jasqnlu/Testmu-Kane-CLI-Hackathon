@@ -20,6 +20,9 @@ Use `/auth/v1/token?grant_type=password` to sign in and pass the returned access
 - `POST /rest/v1/rpc/confirm_extension` with `{"p_minutes":10}`: locks the Study group row, rechecks the balance, deducts 10 credits, records the active expiry, and returns the updated group snapshot. The client cannot mutate balance directly.
 - `POST /rest/v1/rpc/release_reservation` with `{"p_extension_id":"<extension uuid>"}`: locks the group row, marks the signed-in user's active extension as failed, refunds its credits once, and returns the updated snapshot. Repeating the call does not refund again.
 - `POST /rest/v1/rpc/debug_seed_low_balance` with `{}`: available only to fixed owned test identities and Study; clears test extensions and sets the group to 5 credits, without caller-supplied group or balance.
+- `POST /rest/v1/rpc/group_feed` with `{}`: returns only explicitly shared group activity cards. Private reasons are stored in an owner-readable RLS table and are never selected into the group feed.
+- `POST /rest/v1/rpc/choose_extension_sharing` with an extension ID, reason, share choice, and reviewed body: completes the extension and stores the owner's reason; a shared card is published only when the owner chooses Share with Group and posts it.
+- `POST /rest/v1/rpc/debug_seed_private_reason` with `{}`: DEBUG-only fixture for Alice's completed extension, private reason, and sharing choice.
 
 Apply migrations in order to a freshly configured project:
 
@@ -27,8 +30,10 @@ Apply migrations in order to a freshly configured project:
 supabase db query --linked --project-ref wwlbaihtcyyfxoesyytr --file Supabase/migrations/202610240001_m1_auth_groups.sql --output json
 supabase db query --linked --project-ref wwlbaihtcyyfxoesyytr --file Supabase/migrations/202610240002_m2_extensions.sql --output json
 supabase db query --linked --project-ref wwlbaihtcyyfxoesyytr --file Supabase/migrations/202610240003_m3_activation_reconciliation.sql --output json
+supabase db query --linked --project-ref wwlbaihtcyyfxoesyytr --file Supabase/migrations/202610240004_m4_sharing.sql --output json
+supabase db query --linked --project-ref wwlbaihtcyyfxoesyytr --file Supabase/migrations/202610240005_m4_private_feed_filter.sql --output json
 ```
 
-`Scripts/seed.sh normal` ensures the owned membership/profile fixtures and performs the reset using Alice's authenticated session, then checks the returned snapshot. `Scripts/seed.sh low-balance` uses the authenticated allowlisted fixture RPC to set the fixed Study group to 5 credits. Private-reason seed remains deferred to M4. Safe setup summaries are written under `evidence/`; authenticated API checks are not Kane UI passes.
+`Scripts/seed.sh normal` ensures the owned membership/profile fixtures and performs the reset using Alice's authenticated session, then checks the returned snapshot. `Scripts/seed.sh low-balance` uses the authenticated allowlisted fixture RPC to set the fixed Study group to 5 credits. The private-reason fixture is an authenticated DEBUG-only RPC. Safe setup summaries are written under `evidence/`; authenticated API checks are not Kane UI passes.
 
 Documentation consulted: [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security), [Auth admin user creation](https://supabase.com/docs/reference/javascript/auth-admin-createuser), and [Management API query execution](https://supabase.com/docs/reference/api/v1-run-a-query).
