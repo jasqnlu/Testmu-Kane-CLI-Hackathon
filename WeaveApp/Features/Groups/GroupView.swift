@@ -187,11 +187,16 @@ struct GroupView: View {
                     if let error = store.shareError {
                         Text(error).foregroundStyle(.red).accessibilityIdentifier("privacy.error")
                     }
+                    if store.isDraftLoading {
+                        ProgressView("Drafting an activity card…")
+                            .accessibilityIdentifier("share.drafting")
+                    }
                     Button("Keep Private") { Task { await store.keepExtensionPrivate() } }
                         .buttonStyle(.bordered)
                         .accessibilityIdentifier("privacy.keepPrivate")
-                    Button("Share with Group") { store.openShareEditor() }
+                    Button("Share with Group") { Task { await store.openShareEditor() } }
                         .buttonStyle(.borderedProminent)
+                        .disabled(store.isDraftLoading)
                         .accessibilityIdentifier("privacy.shareGroup")
                 }
                 .padding(28)

@@ -23,6 +23,7 @@ Use `/auth/v1/token?grant_type=password` to sign in and pass the returned access
 - `POST /rest/v1/rpc/group_feed` with `{}`: returns only explicitly shared group activity cards. Private reasons are stored in an owner-readable RLS table and are never selected into the group feed.
 - `POST /rest/v1/rpc/choose_extension_sharing` with an extension ID, reason, share choice, and reviewed body: completes the extension and stores the owner's reason; a shared card is published only when the owner chooses Share with Group and posts it.
 - `POST /rest/v1/rpc/debug_seed_private_reason` with `{}`: DEBUG-only fixture for Alice's completed extension, private reason, and sharing choice.
+- `POST /functions/v1/draft-card` with an authenticated extension ID and non-private facts: loads the reason only through its owner-only RLS policy, then drafts a reviewed card. `OPENAI_API_KEY` is a Supabase secret; `OPENAI_MODEL` is optional and defaults to `gpt-6-luna`. The M5 baseline intentionally gives the reason to the model with an instruction not to use it; the guard commit that follows removes it from model input and checks candidate text before returning it.
 
 Apply migrations in order to a freshly configured project:
 
@@ -32,7 +33,10 @@ supabase db query --linked --project-ref wwlbaihtcyyfxoesyytr --file Supabase/mi
 supabase db query --linked --project-ref wwlbaihtcyyfxoesyytr --file Supabase/migrations/202610240003_m3_activation_reconciliation.sql --output json
 supabase db query --linked --project-ref wwlbaihtcyyfxoesyytr --file Supabase/migrations/202610240004_m4_sharing.sql --output json
 supabase db query --linked --project-ref wwlbaihtcyyfxoesyytr --file Supabase/migrations/202610240005_m4_private_feed_filter.sql --output json
+supabase functions deploy draft-card --project-ref wwlbaihtcyyfxoesyytr
 ```
+
+Set `OPENAI_API_KEY` using Supabase project secrets before testing the OpenAI path. Never store it in the app, repository, or Kane variable files. The function returns the editable plain card when the key is absent or a generation fails.
 
 `Scripts/seed.sh normal` ensures the owned membership/profile fixtures and performs the reset using Alice's authenticated session, then checks the returned snapshot. `Scripts/seed.sh low-balance` uses the authenticated allowlisted fixture RPC to set the fixed Study group to 5 credits. The private-reason fixture is an authenticated DEBUG-only RPC. Safe setup summaries are written under `evidence/`; authenticated API checks are not Kane UI passes.
 

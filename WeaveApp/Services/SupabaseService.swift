@@ -10,6 +10,7 @@ protocol BackendServing {
     func confirmExtension(_ session: AuthSession, minutes: Int) async throws -> GroupSnapshot
     func releaseReservation(_ session: AuthSession, extensionID: UUID) async throws -> GroupSnapshot
     func chooseExtensionSharing(_ session: AuthSession, extensionID: UUID, reason: String, share: Bool, body: String?) async throws -> GroupSnapshot
+    func draftCard(_ session: AuthSession, extensionID: UUID, minutes: Int, timeOfDay: String, achievement: String) async throws -> String
     #if DEBUG
     func resetNormal(_ session: AuthSession) async throws -> GroupSnapshot
     func seedLowBalance(_ session: AuthSession) async throws -> GroupSnapshot
@@ -78,6 +79,17 @@ struct SupabaseService: BackendServing {
         return try decoder.decode(GroupSnapshot.self, from: data)
     }
 
+    func draftCard(_ session: AuthSession, extensionID: UUID, minutes: Int, timeOfDay: String, achievement: String) async throws -> String {
+        let data = try await request("functions/v1/draft-card", token: session.accessToken,
+                                     body: ["extension_id": extensionID.uuidString,
+                                            "minutes": minutes,
+                                            "time_of_day": timeOfDay,
+                                            "achievement": achievement],
+                                     timeoutInterval: 10)
+        let response = try decoder.decode(DraftCardResponse.self, from: data)
+        return response.draft
+    }
+
     #if DEBUG
     func resetNormal(_ session: AuthSession) async throws -> GroupSnapshot {
         let data = try await request("rest/v1/rpc/debug_reset_normal", token: session.accessToken)
@@ -96,7 +108,7 @@ struct SupabaseService: BackendServing {
     #endif
 
     private func request(_ path: String, query: [URLQueryItem] = [], token: String? = nil,
-                         body: [String: Any] = [:]) async throws -> Data {
+                         body: [String: Any] = [:], timeoutInterval: TimeInterval = 15) async throws -> Data {
         guard let base = URL(string: LocalConfiguration.url), base.scheme == "https",
               !LocalConfiguration.anonKey.isEmpty,
               var components = URLComponents(url: base.appendingPathComponent(path), resolvingAgainstBaseURL: false) else {
@@ -106,7 +118,7 @@ struct SupabaseService: BackendServing {
         guard let url = components.url else { throw BackendError.configuration }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.timeoutInterval = 15
+        request.timeoutInterval = timeoutInterval
         request.setValue(LocalConfiguration.anonKey, forHTTPHeaderField: "apikey")
         request.setValue("Bearer \(token ?? LocalConfiguration.anonKey)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -127,6 +139,7 @@ struct SupabaseService: BackendServing {
 }
 
 private struct ServiceMessage: Decodable { let message: String? }
+private struct DraftCardResponse: Decodable { let draft: String }
 
 enum BackendError: LocalizedError {
     case configuration, unavailable, unauthorized, signInRejected, insufficientCredits

@@ -19,6 +19,7 @@ final class AppStore: ObservableObject {
     @Published var shareDraft = ""
     @Published var privateReasonDraft = ""
     @Published var shareError: String?
+    @Published private(set) var isDraftLoading = false
     @Published var isShowingSharingChoice = false
     @Published var isShowingShareEditor = false
     private var sharingExtensionID: UUID?
@@ -54,6 +55,7 @@ final class AppStore: ObservableObject {
         isGroupLoading = false
         isRestoring = false
         isExtensionBusy = false
+        isDraftLoading = false
         extensionQuote = nil
         isShowingExtensionQuote = false
         return sessionGeneration
@@ -244,6 +246,7 @@ final class AppStore: ObservableObject {
         guard sharingExtensionID != nil else { return }
         privateReasonDraft = group.completedExtension?.reason ?? ""
         shareError = nil
+        isDraftLoading = false
         isShowingSharingChoice = true
     }
 
@@ -263,10 +266,27 @@ final class AppStore: ObservableObject {
         }
     }
 
-    func openShareEditor() {
-        guard let group, sharingExtensionID != nil else { return }
-        shareDraft = "\(group.userName) used 10 group minutes."
+    func openShareEditor() async {
+        guard let signedIn = session, let group, let extensionID = sharingExtensionID else { return }
+        let generation = sessionGeneration
+        shareDraft = ""
         shareError = nil
+        isDraftLoading = true
+        defer { if generation == sessionGeneration { isDraftLoading = false } }
+        let hour = Calendar.current.component(.hour, from: Date())
+        let timeOfDay = hour < 12 ? "morning" : (hour < 17 ? "afternoon" : "evening")
+        do {
+            let draft = try await backend.draftCard(signedIn, extensionID: extensionID,
+                                                    minutes: 10, timeOfDay: timeOfDay,
+                                                    achievement: "completed a group extension")
+            guard generation == sessionGeneration else { return }
+            shareDraft = draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                ? "\(group.userName) used 10 group minutes." : draft
+        } catch {
+            guard generation == sessionGeneration else { return }
+            shareDraft = "\(group.userName) used 10 group minutes."
+        }
+        guard generation == sessionGeneration else { return }
         isShowingSharingChoice = false
         isShowingShareEditor = true
     }
