@@ -1,12 +1,12 @@
 # Merge notes for main (Codex)
 
-The `design-system` branch adds `WeaveApp/DesignSystem/`. It changes no file under `Features/`, `Services/`, `Models/`, `Debug/`, `Supabase/`, `Tests/`, `Scripts/`, or `.agents/`. Outside this folder it changes only `Weave.xcodeproj/project.pbxproj` (add-only) and `.gitignore` (one line: `build-design/`).
+The `design-system` branch adds `WeaveApp/DesignSystem/`. It changes no file under `Features/`, `Services/`, `Models/`, `Debug/`, `Supabase/`, `Tests/`, `Scripts/`, or `.agents/`. Outside this folder it changes only `Weave.xcodeproj/project.pbxproj` (add-only) and `.gitignore` (one line: `build-design/`). It also adds the app icon in `WeaveApp/DesignSystem/DesignAssets.xcassets` (see **App icon** below).
 
 Nothing here is wired into a screen yet. When a screen adopts a component, that change is under `WeaveApp/Features/`, so run the kane-verify-loop before you commit it.
 
 ## project.pbxproj
 
-Every ID I added uses the prefix `D516`, so it can't collide with the sequential `A000…` IDs on main. No existing line was removed. Two existing lines were extended.
+Every ID I added uses the prefix `D516`, so it can't collide with the sequential `A000…` IDs on main. No existing line was removed. Five existing lines were extended.
 
 ### Existing lines extended
 
@@ -14,8 +14,11 @@ Every ID I added uses the prefix `D516`, so it can't collide with the sequential
 | --- | --- |
 | `A00000000000000000000003` (main group) | `children` gains `D51600000000000000000001`, between `…0009` and `…0004` |
 | `A00000000000000000000005` (Sources build phase) | `files` gains `D51600000000000000000021` … `D51600000000000000000027` at the end |
+| `A00000000000000000000007` (Resources build phase) | `files` was empty, now `(D51600000000000000000028)` |
+| `A00000000000000000000041` (project Debug config) | adds `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;` after `ALWAYS_SEARCH_USER_PATHS = NO;` |
+| `A00000000000000000000042` (project Release config) | same setting, same place |
 
-**Likely conflict:** if main also added files, the `A00000000000000000000005` Sources line conflicts. To resolve it, keep the union of both `files` lists. The order doesn't matter.
+**Likely conflicts:** if main also added files or resources, the `A00000000000000000000005` Sources line or the `A00000000000000000000007` Resources line conflicts. To resolve it, keep the union of both `files` lists. The order doesn't matter. If main edited `A00000000000000000000041` or `…0042`, keep main's settings and re-add `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;`.
 
 ### New lines
 
@@ -31,14 +34,16 @@ All new lines sit together, right after the `A00000000000000000000010` (XCConfig
 | `D51600000000000000000015` | PBXFileReference | `PrivacyChoice.swift` |
 | `D51600000000000000000016` | PBXFileReference | `FeedCard.swift` |
 | `D51600000000000000000017` | PBXFileReference | `StatusBanner.swift` |
-| `D51600000000000000000021` … `27` | PBXBuildFile | one per file reference above, same order (`…21` → `…11`, … `…27` → `…17`) |
+| `D51600000000000000000018` | PBXFileReference | `DesignAssets.xcassets` (folder.assetcatalog), child of group `…0001` |
+| `D51600000000000000000021` … `28` | PBXBuildFile | one per file reference above, same order (`…21` → `…11`, … `…28` → `…18`). `…28` is in the Resources phase. |
 
-`README.md` and this file aren't in the project. They're documentation only.
+`README.md`, this file, and `IconSource/` aren't in the project.
 
 ### Checking the merge
 
 ```sh
-grep -c D5160000 Weave.xcodeproj/project.pbxproj    # 17 lines (15 new + 2 extended) before the app icon
+grep -c D5160000 Weave.xcodeproj/project.pbxproj    # 20 lines (17 new + 3 extended)
+grep -c 'ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon' Weave.xcodeproj/project.pbxproj   # 2
 plutil -lint Weave.xcodeproj/project.pbxproj
 xcodebuild -scheme Weave -sdk iphonesimulator -configuration Debug -derivedDataPath build build
 ```
@@ -71,8 +76,23 @@ The strings below come from `Requirements/acceptance-criteria.md` and the curren
 - **Containers.** `BalanceCard`, `FeedCard`, and `StatusBanner` use `.accessibilityElement(children: .contain)`, so their inner texts stay separate elements.
 - **`LocalConfiguration.swift`.** This worktree has a gitignored placeholder with empty values, for compile checks only. It is not committed, and `Scripts/build-sim.sh` overwrites it.
 
+## App icon
+
+`WeaveApp/DesignSystem/DesignAssets.xcassets/AppIcon.appiconset` holds three 1024×1024 opaque PNGs: three pastel rings (mint, periwinkle, peach) woven over and under each other, one ring per study-group member.
+
+| File | Appearance | Background |
+| --- | --- | --- |
+| `AppIcon.png` | default | brand green `#2D6A4F` |
+| `AppIcon-Dark.png` | dark | `#0B0B0C` |
+| `AppIcon-Tinted.png` | tinted (iOS 18+) | black, grayscale rings |
+
+**Before merging:** if main has added its own asset catalog with an `AppIcon` set, keep only one `AppIcon`, or the build fails with a duplicate-name error. Either delete main's `AppIcon.appiconset`, or move this one into main's catalog and drop `D51600000000000000000018` / `…0028`. Other images (colors, symbols) can live in either catalog.
+
+The PNGs are generated by `IconSource/make_app_icon.swift`, a CoreGraphics script that isn't in the app target. To regenerate them, run `swift WeaveApp/DesignSystem/IconSource/make_app_icon.swift WeaveApp/DesignSystem/DesignAssets.xcassets/AppIcon.appiconset`.
+
 ## Verification done on this branch
 
 - `xcodebuild -scheme Weave -sdk iphonesimulator -configuration Debug -derivedDataPath build-design build`: succeeded, no warnings.
 - All 9 preview samples rendered in light and dark mode on a throwaway simulator that was deleted afterwards. The harness was outside the repo.
+- App icon: the build produces `Assets.car` with AppIcon (default, dark, tinted), and `Info.plist` has `CFBundleIconName = AppIcon`.
 - No Kane runs. Nothing user-facing on a screen changed.
