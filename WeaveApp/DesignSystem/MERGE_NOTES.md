@@ -90,9 +90,25 @@ The strings below come from `Requirements/acceptance-criteria.md` and the curren
 
 The PNGs are rendered from `Brand/svg/appicon-*.svg`, which `Brand/source/make_logo.py` generates. See `Brand/BRAND.md` → **Regenerating**. The earlier `IconSource/make_app_icon.swift` was removed, so the logo script is now the single source.
 
+## Logo assets (not wired into any screen)
+
+`DesignAssets.xcassets` also has two SVG image sets with vector data preserved. Each picks its version by appearance:
+
+| Asset | Light mode | Dark mode | Use |
+| --- | --- | --- | --- |
+| `WeaveLogo` | green one-colour rings | full-colour rings | symbol, e.g. `Image("WeaveLogo")` |
+| `WeaveLockup` | black symbol + wordmark | colour-on-dark symbol + white wordmark | horizontal lockup |
+
+These follow the contrast rule in `Brand/BRAND.md`: full-colour rings only on dark backgrounds. No screen uses them yet.
+
+**Sign-in screen: show logo above the title; Codex to wire in after M6, then rerun the full Kane suite.**
+
+Give the image an accessibility label equal to the app name, or mark it decorative (`.accessibilityHidden(true)`), so Kane's text queries on the sign-in screen don't change.
+
 ## Verification done on this branch
 
 - `xcodebuild -scheme Weave -sdk iphonesimulator -configuration Debug -derivedDataPath build-design build`: succeeded, no warnings.
 - All 9 preview samples rendered in light and dark mode on a throwaway simulator that was deleted afterwards. The harness was outside the repo.
+- Logo image sets: the build compiles `WeaveLogo` and `WeaveLockup` (light and dark) into `Assets.car`.
 - App icon: the build produces `Assets.car` with AppIcon (default, dark, tinted), and `Info.plist` has `CFBundleIconName = AppIcon`.
 - No Kane runs. Nothing user-facing on a screen changed.
