@@ -13,6 +13,36 @@ function json(status: number, value: unknown): Response {
   });
 }
 
+const privateReasonFamilies: Record<string, string[]> = {
+  chemistry: ["chemistry", "chemical", "science", "lab", "laboratory"],
+  test: ["test", "exam", "quiz", "assessment"],
+  anxiety: ["anxiety", "anxious", "stress", "stressed", "worry", "worried", "nervous"],
+};
+
+function words(value: string): Set<string> {
+  return new Set(value.toLowerCase().match(/[a-z0-9]+/g) ?? []);
+}
+
+function normalized(value: string): string {
+  return (value.toLowerCase().match(/[a-z0-9]+/g) ?? []).join(" ");
+}
+
+function disclosesPrivateReason(candidate: string, reason: string): boolean {
+  const draftWords = words(candidate);
+  const reasonWords = words(reason);
+  const normalizedDraft = normalized(candidate);
+  const normalizedReason = normalized(reason);
+  if (normalizedReason && normalizedDraft.includes(normalizedReason)) return true;
+
+  const highSignal = [...reasonWords].filter((word) => word.length >= 5);
+  if (highSignal.some((word) => draftWords.has(word))) return true;
+
+  const matchingFamilies = Object.entries(privateReasonFamilies)
+    .filter(([term]) => reasonWords.has(term));
+  const familyMatches = matchingFamilies.filter(([, variants]) => variants.some((word) => draftWords.has(word)));
+  return matchingFamilies.length >= 2 && familyMatches.length >= 2;
+}
+
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (request.method !== "POST") return json(405, { error: "Method not allowed" });
@@ -40,9 +70,8 @@ Deno.serve(async (request) => {
     return json(400, { error: "Extension facts are required." });
   }
 
-  // The private reason is read under the caller's owner-only RLS policy. This first,
-  // deliberately straightforward version still places it in model context; the
-  // M5 privacy guard removes it from this prompt after Kane's baseline runs.
+  // Read the reason under the caller's owner-only RLS policy for a server-side
+  // response check. The reason is never sent to the model.
   const reasonURL = new URL("/rest/v1/private_extension_reasons", supabaseURL);
   reasonURL.searchParams.set("select", "reason");
   reasonURL.searchParams.set("extension_id", `eq.${input.extension_id}`);
@@ -64,29 +93,39 @@ Deno.serve(async (request) => {
   const apiKey = Deno.env.get("OPENAI_API_KEY");
   if (!apiKey) return json(200, { draft: fallbackDraft(input.minutes), source: "fallback" });
 
-  try {
-    const response = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      signal: AbortSignal.timeout(8_000),
-      body: JSON.stringify({
-        model: Deno.env.get("OPENAI_MODEL") ?? "gpt-6-luna",
-        instructions: "Write one short, warm activity card for a study group. The private reason is background only. Never mention it, quote it, infer it, or paraphrase it. Return only the card text.",
-        input: `The member used ${input.minutes} group minutes in the ${input.time_of_day}. Achievement: ${input.achievement}. Private reason for this extension (do not mention or reveal it): ${reason}`,
-        max_output_tokens: 80,
-      }),
-    });
-    if (!response.ok) return json(200, { draft: fallbackDraft(input.minutes), source: "fallback" });
-    const result = await response.json();
-    const text = typeof result.output_text === "string"
-      ? result.output_text
-      : (result.output ?? []).flatMap((item: { content?: Array<{ type?: string; text?: string }> }) => item.content ?? [])
-          .find((item: { type?: string }) => item.type === "output_text")?.text;
-    if (typeof text !== "string" || !text.trim() || text.length > 500) {
+  const deadline = Date.now() + 8_000;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) break;
+    try {
+      const response = await fetch("https://api.openai.com/v1/responses", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        signal: AbortSignal.timeout(remaining),
+        body: JSON.stringify({
+          model: Deno.env.get("OPENAI_MODEL") ?? "gpt-6-luna",
+          instructions: attempt === 0
+            ? "Write one short, warm activity card for a study group using only the supplied group activity facts. Return only the card text."
+            : "Write one short, warm, generic group activity card. Do not mention personal challenges or reasons. Return only the card text.",
+          input: `The member used ${input.minutes} group minutes in the ${input.time_of_day}. Achievement: ${input.achievement}.`,
+          max_output_tokens: 80,
+        }),
+      });
+      if (!response.ok) return json(200, { draft: fallbackDraft(input.minutes), source: "fallback" });
+      const result = await response.json();
+      const text = typeof result.output_text === "string"
+        ? result.output_text
+        : (result.output ?? []).flatMap((item: { content?: Array<{ type?: string; text?: string }> }) => item.content ?? [])
+            .find((item: { type?: string }) => item.type === "output_text")?.text;
+      if (typeof text !== "string" || !text.trim() || text.length > 500) {
+        return json(200, { draft: fallbackDraft(input.minutes), source: "fallback" });
+      }
+      const candidate = text.trim();
+      if (disclosesPrivateReason(candidate, reason)) continue;
+      return json(200, { draft: candidate, source: "openai" });
+    } catch {
       return json(200, { draft: fallbackDraft(input.minutes), source: "fallback" });
     }
-    return json(200, { draft: text.trim(), source: "openai" });
-  } catch {
-    return json(200, { draft: fallbackDraft(input.minutes), source: "fallback" });
   }
+  return json(200, { draft: fallbackDraft(input.minutes), source: "fallback" });
 });

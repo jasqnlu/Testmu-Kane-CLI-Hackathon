@@ -15,8 +15,8 @@
 | PRIV-01 | [keep-alice-s-completed-extension-out-of-the-group-feed_test.md](../Tests/Kane/privacy/keep-alice-s-completed-extension-out-of-the-group-feed_test.md); [keep-alice-s-private-reason-out-of-bob-s-group-feed_test.md](../Tests/Kane/privacy/keep-alice-s-private-reason-out-of-bob-s-group-feed_test.md) | [PRIV-01_red_20261024.evidence](packs/PRIV-01_red_20261024.evidence) | [PRIV-01_green_20261024.evidence](packs/PRIV-01_green_20261024.evidence) | Kane confirmed Bob could see Alice’s private reason, “chemistry test anxiety,” in the group feed (testmd step 4, nested assertion step 3). After the feed filter, the committed checks passed for both the card and reason being absent; the separate SQL RLS check also passed. The later neighbor suite exposed a seed-before-sign-in flow and a whole-screen card selector in its test recordings; see [diagnostic suite pack](packs/PRIV-01_neighbor_suite_diagnostic_20261024.evidence), not a product red.
 | SHARE-01 | Pending | — | — | Not yet verified |
 | SHARE-02 | [post-alice-s-edited-extension-card-after-review_test.md](../Tests/Kane/ai/post-alice-s-edited-extension-card-after-review_test.md) (related committed flow; direct Kane objective run) | — | [SHARE-02_fallback_post_20261024.evidence](packs/SHARE-02_fallback_post_20261024.evidence) | Kane verified one Alice card with the edited text after explicit Post, with the private reason absent. This used the no-key fallback, not an OpenAI draft. |
-| AI-01 | [card_never_leaks_reason_test.md](../Tests/Kane/ai/card_never_leaks_reason_test.md); [keep-private-reason-out-of-five-completed-ai-drafts_test.md](../Tests/Kane/ai/keep-private-reason-out-of-five-completed-ai-drafts_test.md) | — | — | Pending: Supabase has no `OPENAI_API_KEY` secret yet. The deployed naive function is ready for five fresh pre-guard generations; the missing-key fallback run is not an AI-01 measurement. |
-| AI-02 | Pending | — | — | Not yet verified |
+| AI-01 | Share → AI draft → edit → Post (short objective) | — | [AI-01_post_guard_green_20261024.evidence](packs/AI-01_post_guard_green_20261024.evidence) | Passed with source=openai; edited card posted once and private reason absent. |
+| AI-02 | Fresh OpenAI draft privacy samples | — | [AI-02_sample_1_20261024.evidence](packs/AI-02_sample_1_20261024.evidence) | 1/5 sampled so far; see KANE_LOG.md. |
 | SAFE-01 | Pending | — | — | Not yet verified |
 
 The full M3 extension regression suite is [M3_extensions_green_20261024.evidence](packs/M3_extensions_green_20261024.evidence) (4/4, 9 criteria).
@@ -32,6 +32,9 @@ Validate selected packs with `kane-cli evidence validate <path>` before indexing
 
 ## What Kane caught
 
+- **M5 AI-02 privacy sample 1/5:** Fresh Kane run returned source=openai and the draft “Nice work this afternoon! You used 10 group minutes and completed a group extension.”; checked privacy terms were absent. The editor was cancelled without posting. Pack: [AI-02 sample 1](packs/AI-02_sample_1_20261024.evidence).
+- **M5 AI-01 green:** Kane verified Share → OpenAI draft → edit → Post in session `d0eda25c-0b1a-485f-a932-6ff0ce26529e` (run-0, exit 0). It confirmed the editor used OpenAI, the private reason was absent from the draft, the edited walk card appeared once, and the reason stayed out of the feed. Pack: [AI-01 post-guard green](packs/AI-01_post_guard_green_20261024.evidence).
+- **M5 AI-01 agent misstep:** session `bf2bdaa6-8c65-46dc-8b75-5dc690dce560` posted the card successfully with OpenAI source and passed its privacy check, then the agent continued into a later group-load error and marked the run failed. No card or privacy defect was confirmed. Pack: [post-after-success misstep](packs/AI-01_post_guard_after_post_agent_misstep_20261024.evidence).
 - **M4 PRIV-01 red/green pair complete:** the pre-guard Bob-feed test failed at nested run step 3 with Alice's private reason visible; the post-filter rerun passed. Packs: [PRIV-01 red](packs/PRIV-01_red_20261024.evidence) and [PRIV-01 green](packs/PRIV-01_green_20261024.evidence).
 - **M5 headless session-store issue (environment):** the OpenAI baseline Kane session registered a test but stalled before any test step or terminal event. The local Kane process was stopped, and the dedicated iPhone 17 Pro simulator was shut down and erased. This is an environment issue, not a product bug; it is not counted as a run.
 - **M5 direct function probe:** The first authenticated call returned fallback because OpenAI reported exhausted API credits. After the user added $5, a second direct call returned HTTP 200 with `source: openai`; the redacted 71-character draft is indexed at [successful direct probe](packs/AI-01_direct_openai_success_20261024.json). This proves the deployed API path, but it is not a Kane AI-01 or AI-02 pass.
@@ -63,7 +66,7 @@ Validate selected packs with `kane-cli evidence validate <path>` before indexing
 - Product OpenAI call verified from the Supabase draft-card Edge Function.
 - Real red→green pair, green journey, and green smoke suite saved and validated.
 - Requirement-linked committed replay tests, completed assurance loop, and exploration recorded.
-- AI privacy gate passed five times; fallback checked.
+- AI privacy gate: fresh AI-02 sample count to be recorded after sampling; fallback checked.
 - Final merged pack path identified for attachment.
 
 ## M0 setup evidence

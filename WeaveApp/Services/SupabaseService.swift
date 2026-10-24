@@ -9,13 +9,19 @@ protocol BackendServing {
     func extensionQuote(_ session: AuthSession, minutes: Int) async throws -> ExtensionQuote
     func confirmExtension(_ session: AuthSession, minutes: Int) async throws -> GroupSnapshot
     func releaseReservation(_ session: AuthSession, extensionID: UUID) async throws -> GroupSnapshot
+    func storePrivateExtensionReason(_ session: AuthSession, extensionID: UUID, reason: String) async throws
     func chooseExtensionSharing(_ session: AuthSession, extensionID: UUID, reason: String, share: Bool, body: String?) async throws -> GroupSnapshot
-    func draftCard(_ session: AuthSession, extensionID: UUID, minutes: Int, timeOfDay: String, achievement: String) async throws -> String
+    func draftCard(_ session: AuthSession, extensionID: UUID, minutes: Int, timeOfDay: String, achievement: String) async throws -> DraftCardResult
     #if DEBUG
     func resetNormal(_ session: AuthSession) async throws -> GroupSnapshot
     func seedLowBalance(_ session: AuthSession) async throws -> GroupSnapshot
     func seedPrivateReason(_ session: AuthSession) async throws -> GroupSnapshot
     #endif
+}
+
+struct DraftCardResult {
+    let draft: String
+    let source: String
 }
 
 struct SupabaseService: BackendServing {
@@ -70,6 +76,11 @@ struct SupabaseService: BackendServing {
         return try decoder.decode(GroupSnapshot.self, from: data)
     }
 
+    func storePrivateExtensionReason(_ session: AuthSession, extensionID: UUID, reason: String) async throws {
+        _ = try await request("rest/v1/rpc/store_private_extension_reason", token: session.accessToken,
+                              body: ["p_extension_id": extensionID.uuidString, "p_reason": reason])
+    }
+
     func chooseExtensionSharing(_ session: AuthSession, extensionID: UUID, reason: String, share: Bool, body: String?) async throws -> GroupSnapshot {
         let data = try await request("rest/v1/rpc/choose_extension_sharing", token: session.accessToken,
                                      body: ["p_extension_id": extensionID.uuidString,
@@ -79,7 +90,7 @@ struct SupabaseService: BackendServing {
         return try decoder.decode(GroupSnapshot.self, from: data)
     }
 
-    func draftCard(_ session: AuthSession, extensionID: UUID, minutes: Int, timeOfDay: String, achievement: String) async throws -> String {
+    func draftCard(_ session: AuthSession, extensionID: UUID, minutes: Int, timeOfDay: String, achievement: String) async throws -> DraftCardResult {
         let data = try await request("functions/v1/draft-card", token: session.accessToken,
                                      body: ["extension_id": extensionID.uuidString,
                                             "minutes": minutes,
@@ -87,7 +98,7 @@ struct SupabaseService: BackendServing {
                                             "achievement": achievement],
                                      timeoutInterval: 10)
         let response = try decoder.decode(DraftCardResponse.self, from: data)
-        return response.draft
+        return DraftCardResult(draft: response.draft, source: response.source)
     }
 
     #if DEBUG
@@ -139,7 +150,10 @@ struct SupabaseService: BackendServing {
 }
 
 private struct ServiceMessage: Decodable { let message: String? }
-private struct DraftCardResponse: Decodable { let draft: String }
+private struct DraftCardResponse: Decodable {
+    let draft: String
+    let source: String
+}
 
 enum BackendError: LocalizedError {
     case configuration, unavailable, unauthorized, signInRejected, insufficientCredits

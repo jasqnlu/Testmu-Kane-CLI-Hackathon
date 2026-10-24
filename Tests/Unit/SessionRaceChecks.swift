@@ -71,11 +71,12 @@ private actor ControlledBackend: BackendServing {
     func releaseReservation(_ session: AuthSession, extensionID: UUID) async throws -> GroupSnapshot {
         Self.group(session.accessToken.contains("bob") ? "Bob" : "Alice")
     }
+    func storePrivateExtensionReason(_ session: AuthSession, extensionID: UUID, reason: String) async throws {}
     func chooseExtensionSharing(_ session: AuthSession, extensionID: UUID, reason: String, share: Bool, body: String?) async throws -> GroupSnapshot {
         Self.group(session.accessToken.contains("bob") ? "Bob" : "Alice")
     }
-    func draftCard(_ session: AuthSession, extensionID: UUID, minutes: Int, timeOfDay: String, achievement: String) async throws -> String {
-        "Alice used 10 group minutes."
+    func draftCard(_ session: AuthSession, extensionID: UUID, minutes: Int, timeOfDay: String, achievement: String) async throws -> DraftCardResult {
+        DraftCardResult(draft: "Alice used 10 group minutes.", source: "fallback")
     }
     #if DEBUG
     func resetNormal(_ session: AuthSession) async throws -> GroupSnapshot { try await groupSnapshot(session) }

@@ -205,6 +205,11 @@ struct GroupView: View {
             .sheet(isPresented: $store.isShowingShareEditor) {
                 VStack(spacing: 16) {
                     Text("Review your group card").font(.title2.weight(.semibold))
+                    #if DEBUG
+                    Text("Draft source: \(store.draftSource)")
+                        .font(.caption)
+                        .accessibilityIdentifier("share.draftSource")
+                    #endif
                     TextEditor(text: $store.shareDraft)
                         .frame(minHeight: 120)
                         .accessibilityIdentifier("share.draft")

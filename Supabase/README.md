@@ -22,8 +22,9 @@ Use `/auth/v1/token?grant_type=password` to sign in and pass the returned access
 - `POST /rest/v1/rpc/debug_seed_low_balance` with `{}`: available only to fixed owned test identities and Study; clears test extensions and sets the group to 5 credits, without caller-supplied group or balance.
 - `POST /rest/v1/rpc/group_feed` with `{}`: returns only explicitly shared group activity cards. Private reasons are stored in an owner-readable RLS table and are never selected into the group feed.
 - `POST /rest/v1/rpc/choose_extension_sharing` with an extension ID, reason, share choice, and reviewed body: completes the extension and stores the owner's reason; a shared card is published only when the owner chooses Share with Group and posts it.
+- `POST /rest/v1/rpc/store_private_extension_reason` with `p_extension_id` and `p_reason`: saves the signed-in owner's reason privately before drafting. It accepts only the owner's active or completed extension and does not publish a card.
 - `POST /rest/v1/rpc/debug_seed_private_reason` with `{}`: DEBUG-only fixture for Alice's completed extension, private reason, and sharing choice.
-- `POST /functions/v1/draft-card` with an authenticated extension ID and non-private facts: loads the reason only through its owner-only RLS policy, then drafts a reviewed card. `OPENAI_API_KEY` is a Supabase secret; `OPENAI_MODEL` is optional and defaults to `gpt-6-luna`. The M5 baseline intentionally gives the reason to the model with an instruction not to use it; the guard commit that follows removes it from model input and checks candidate text before returning it.
+- `POST /functions/v1/draft-card` with an authenticated extension ID and non-private facts: loads the reason only through its owner-only RLS policy, sends only minutes, time of day, and achievement to OpenAI, then checks candidate text against the private reason and retries once if it overlaps. A contaminated or invalid draft returns the plain fallback. `OPENAI_API_KEY` is a Supabase secret; `OPENAI_MODEL` is optional and defaults to `gpt-6-luna`.
 
 Apply migrations in order to a freshly configured project:
 
@@ -33,6 +34,7 @@ supabase db query --linked --project-ref wwlbaihtcyyfxoesyytr --file Supabase/mi
 supabase db query --linked --project-ref wwlbaihtcyyfxoesyytr --file Supabase/migrations/202610240003_m3_activation_reconciliation.sql --output json
 supabase db query --linked --project-ref wwlbaihtcyyfxoesyytr --file Supabase/migrations/202610240004_m4_sharing.sql --output json
 supabase db query --linked --project-ref wwlbaihtcyyfxoesyytr --file Supabase/migrations/202610240005_m4_private_feed_filter.sql --output json
+supabase db query --linked --project-ref wwlbaihtcyyfxoesyytr --file Supabase/migrations/202610240006_m5_private_draft.sql --output json
 supabase functions deploy draft-card --project-ref wwlbaihtcyyfxoesyytr
 ```
 
