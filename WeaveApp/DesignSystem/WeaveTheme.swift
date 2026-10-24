@@ -208,11 +208,13 @@ struct WeaveChip: View {
     let text: String
     var systemImage: String? = nil
     var style: Style = .dark
+    var identifier: String? = nil
 
-    init(_ text: String, systemImage: String? = nil, style: Style = .dark) {
+    init(_ text: String, systemImage: String? = nil, style: Style = .dark, identifier: String? = nil) {
         self.text = text
         self.systemImage = systemImage
         self.style = style
+        self.identifier = identifier
     }
 
     var body: some View {
@@ -223,6 +225,7 @@ struct WeaveChip: View {
                     .accessibilityHidden(true)
             }
             Text(text)
+                .weaveIdentifier(identifier)
         }
         .weaveFont(.chip)
         .lineLimit(1)

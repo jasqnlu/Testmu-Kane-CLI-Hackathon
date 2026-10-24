@@ -40,3 +40,6 @@ Config/
 # Python helper bytecode
 __pycache__/
 *.pyc
+
+# Design-system branch build output
+build-design/

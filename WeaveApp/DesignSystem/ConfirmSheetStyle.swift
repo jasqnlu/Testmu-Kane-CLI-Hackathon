@@ -13,6 +13,7 @@ struct ConfirmSheetStyle: View {
     let cancelTitle: String
     var isConfirming = false
     var confirmingTitle: String? = nil
+    var titleIdentifier: String? = nil
     var summaryIdentifier: String? = nil
     var confirmIdentifier: String? = nil
     var cancelIdentifier: String? = nil
@@ -26,6 +27,7 @@ struct ConfirmSheetStyle: View {
                     .weaveFont(.display)
                     .accessibilityAddTraits(.isHeader)
                     .fixedSize(horizontal: false, vertical: true)
+                    .weaveIdentifier(titleIdentifier)
                 if let message {
                     Text(message)
                         .weaveFont(.body)

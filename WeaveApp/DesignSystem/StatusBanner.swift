@@ -17,7 +17,9 @@ struct StatusBanner: View {
     var detail: String? = nil
     /// A trailing chip, such as "10 min". Shown for `.active` only.
     var chip: String? = nil
+    /// Set on the title text.
     var identifier: String? = nil
+    var detailIdentifier: String? = nil
 
     var body: some View {
         Group {
@@ -96,6 +98,7 @@ struct StatusBanner: View {
                     .weaveFont(.label)
                     .opacity(detailOpacity)
                     .fixedSize(horizontal: false, vertical: true)
+                    .weaveIdentifier(detailIdentifier)
             }
         }
     }

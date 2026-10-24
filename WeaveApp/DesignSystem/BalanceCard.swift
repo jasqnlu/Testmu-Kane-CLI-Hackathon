@@ -21,6 +21,8 @@ struct BalanceCard: View {
     var memberNames: [String] = []
     var style: Style = .standard
     var amountIdentifier: String? = nil
+    /// Set on the card container.
+    var identifier: String? = nil
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -58,6 +60,7 @@ struct BalanceCard: View {
         .foregroundStyle(primaryColor)
         .weaveTile(fill)
         .accessibilityElement(children: .contain)
+        .weaveIdentifier(identifier)
     }
 
     // MARK: Parts

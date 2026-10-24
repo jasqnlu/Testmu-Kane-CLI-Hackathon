@@ -18,7 +18,7 @@ Each file has `#Preview`s for light and dark mode with sample data.
 
 View helpers: `.weaveFont(_:)`, `.weaveTile(_ fill:padding:)`, `.weaveIdentifier(_:)` (sets an ID only when one is given), and `.weaveSheetPresentation()`.
 
-`WeaveChip(_ text:systemImage:style:)` is a small capsule tag such as "10 min". Styles: `.dark`, `.light` (for use on pastels), `.muted`, `.mint`.
+`WeaveChip(_ text:systemImage:style:identifier:)` is a small capsule tag such as "10 min". Styles: `.dark`, `.light` (for use on pastels), `.muted`, `.mint`. `identifier` is set on the chip text.
 
 The older `WeaveStyle` (`ink`, `cream`) in `WeaveApp.swift` still exists. Screens can move to `WeaveTheme` one at a time.
 
@@ -36,7 +36,8 @@ The group's shared credits, with the number as the main element.
 | `fraction` | `Double?` | 0...1, shown as a five-segment meter. `nil` hides it. |
 | `memberNames` | `[String]` | optional initials row |
 | `style` | `.standard` / `.brand` | white or charcoal tile, or deep green |
-| `amountIdentifier` | `String?` | e.g. `"group.balance"` |
+| `amountIdentifier` | `String?` | e.g. `"group.balance"`, set on the amount text |
+| `identifier` | `String?` | set on the card container |
 
 ### PrimaryButton and SecondaryButton (every screen)
 
@@ -65,7 +66,7 @@ Sheet content for "10 minutes · 10 credits" confirmations. Present it with `.we
 | `confirmTitle`, `cancelTitle` | `String` | |
 | `isConfirming` | `Bool` | Puts Confirm into its loading state and disables Cancel |
 | `confirmingTitle` | `String?` | |
-| `summaryIdentifier`, `confirmIdentifier`, `cancelIdentifier` | `String?` | |
+| `titleIdentifier`, `summaryIdentifier`, `confirmIdentifier`, `cancelIdentifier` | `String?` | |
 | `onConfirm`, `onCancel` | `() -> Void` | |
 
 ### PrivacyChoice (Privacy choice)
@@ -91,6 +92,7 @@ One posted activity card. The tile color and initials come from the member name.
 | `timestamp` | `String?` | already formatted by the screen |
 | `tags` | `[String]` | optional chips, e.g. `["10 min"]` |
 | `identifier` | `String?` | set on the card container |
+| `textIdentifier` | `String?` | set on the body text |
 
 ### StatusBanner (Extension banner)
 
@@ -101,6 +103,7 @@ One posted activity card. The tile color and initials come from the member name.
 | `detail` | `String?` | optional second line |
 | `chip` | `String?` | `.active` only, e.g. "10 min" |
 | `identifier` | `String?` | set on the title text |
+| `detailIdentifier` | `String?` | set on the detail text |
 
 ## Example
 
@@ -114,6 +117,8 @@ BalanceCard(
     amountIdentifier: "group.balance"
 )
 ```
+
+See [MERGE_NOTES.md](MERGE_NOTES.md) for merging with main.
 
 ## Xcode project
 

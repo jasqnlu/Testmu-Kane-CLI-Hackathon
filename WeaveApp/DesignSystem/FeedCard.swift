@@ -9,7 +9,10 @@ struct FeedCard: View {
     let text: String
     var timestamp: String? = nil
     var tags: [String] = []
+    /// Set on the card container.
     var identifier: String? = nil
+    /// Set on the body text, for checking the posted text exactly.
+    var textIdentifier: String? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: WeaveTheme.Spacing.sm) {
@@ -34,6 +37,7 @@ struct FeedCard: View {
             Text(text)
                 .weaveFont(.body)
                 .fixedSize(horizontal: false, vertical: true)
+                .weaveIdentifier(textIdentifier)
 
             if !tags.isEmpty {
                 HStack(spacing: 6) {
