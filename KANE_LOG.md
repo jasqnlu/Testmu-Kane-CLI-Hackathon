@@ -43,7 +43,7 @@ For failures, record the failing step, expected versus observed outcome, screens
 
 ## Unresolved
 
-- M2 is green but lacks its intended pre-guard CREDIT-02 red because the guard was already present at session start. M3 RECOV-01 is green with a preserved red/green pair; CREDIT-01 SQL concurrency verification remains pending. M4–M6 privacy/sharing, OpenAI card, and full journey remain.
+- M2 is green but lacks its intended pre-guard CREDIT-02 red because the guard was already present at session start. M3 RECOV-01 is green with a preserved red/green pair; CREDIT-01 SQL concurrency verification remains pending. M4 privacy/sharing is in progress; M5 OpenAI card and M6 full journey remain.
 - Product OpenAI call, CREDIT-01 SQL concurrency and RLS checks, five AI privacy runs, and final journey pack remain pending. RECOV-01 has a genuine pre-guard red→green pair; the M3 bughunt ended in an agent misstep and no confirmed finding.
 - Dedicated SQL concurrency and RLS tests are still required. Existing authenticated API privilege probes are summarized in `evidence/backend-m1-api-checks.json`.
 
@@ -109,3 +109,10 @@ Refresh this ledger after each milestone and use a final `kane-cli cover` result
 
 - 2026-10-24 13:55–14:00 PDT | extension double-confirm bughunt (`kane-cli run --bug-detection continue --agent`) | exploration | BROKEN / exit 1; session `f5560421-0320-4971-bb2a-4f104868663f`, execution `a1384dc5-3f76-4858-8a1b-c1bb51239a2f` | agent misstep, no confirmed product bug | Kane's terminal verdict: the agent analyzed before confirming and never tapped Confirm; no product error or contradictory app state was observed. It had observed the ordinary active extension with a valid expiry. Pack saved and validated at `evidence/packs/M3_extension_bughunt_agent_misstep_20261024.evidence`.
 - 2026-10-24 13:35 PDT | `Scripts/seed.sh normal` | setup | ENVIRONMENT / exit 2 | local filesystem permission | Supabase CLI could not write `/Users/jasonlu/.supabase/telemetry.json`; the authorized retry succeeded and verified the normal fixture at 40 credits. No UI result was claimed from the failed attempt.
+
+
+## M4 privacy/sharing (pre-guard baseline)
+
+- Test-first provenance: the committed PRIV-01 tests were already present in scaffold commit `963abb9`, before M4 implementation. The first M4 baseline stores reasons and exposes all completed reasons in the group feed, as the simple unfiltered implementation.
+- 2026-10-24 14:09–14:15 PDT | `keep-alice-s-completed-extension-out-of-the-group-feed_test.md` | PRIV-01 / AC-28 | PASSED (`test_md_done`, exit 0; session `60a9fc48-bdee-4ce4-9920-944823d9d65b`, execution `d855ddb2-d0da-49d6-8d4c-87da650e8967`) | baseline | Kane visually reported no card after Keep Private. A read-only authenticated RPC check immediately afterward found one feed item whose body was `chemistry test anxiety`. This visual pass did not verify the backend privacy boundary; no guard was present.
+- 2026-10-24 14:15–14:19 PDT | `keep-alice-s-private-reason-out-of-bob-s-group-feed_test.md` | PRIV-01 / AC-29 | FAILED (`test_md_done`, exit 1; session `e9f64341-9186-422f-b724-5d82de8b436a`, execution `897330c8-1d3a-4539-b0f7-60eb251215c9`) | product | Pre-guard source HEAD `035fe9a9b41ebfac8fcb8d6f6837569f779aa22c`. Failing assertion: testmd step 4, nested run step 3; expected private reason text absent, observed `chemistry test anxiety` in Bob's Group activity feed. Kane's terminal verdict confirms a product defect. Full pack saved and validated as `evidence/packs/PRIV-01_red_20261024.evidence`.
