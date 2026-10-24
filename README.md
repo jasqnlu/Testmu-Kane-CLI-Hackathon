@@ -65,7 +65,7 @@ Kane exposed a headless simulator session-store incompatibility before the M1 au
 | Keep Private and reviewed sharing | Kane | M4 PRIV-01 red/green complete; M5 AI-01 share → OpenAI draft → edit → Post passed |
 | RLS access to private reasons | SQL security test | Pending; Kane cannot prove this |
 | AI privacy gate and fallback | Kane, five privacy repetitions | 4/5 fresh OpenAI drafts sampled by the 16:15 cutoff; fifth not run; fallback checked |
-| Full journey and smoke suite | Kane sealed evidence | Live full journey passed; smoke suite running. See [journey pack](evidence/packs/journey_final.evidence) |
+| Full journey and smoke suite | Kane sealed evidence | Live journey passed; smoke passed 6/6; merged [final pack](evidence/packs/weave-final.evidence) |
 | Release debug exclusion (SAFE-01) | Unit/build checks and review | Pending |
 | Real Screen Time shielding | Physical device | Not verified at hackathon |
 
