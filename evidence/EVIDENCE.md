@@ -1,6 +1,6 @@
 # Weave evidence index
 
-**Submission status: not ready.** M1 auth and group flows now have a validated Kane pack. Later product flows and submission gates remain open. Empty cells below mean unverified, not passing.
+**Submission status: not ready.** M1 auth/group and the existing M3 double-tap behavior have validated Kane evidence; RECOV-01 has a pre-guard red awaiting its fix and green rerun. Remaining product flows and submission gates are open. Empty cells below mean unverified, not passing.
 
 | Requirement | Test file | Red pack | Green pack | What Kane caught |
 | --- | --- | --- | --- | --- |
@@ -10,7 +10,7 @@
 | CREDIT-02 | Pending | — | — | Not yet verified |
 | EXT-01 | Pending | — | — | Not yet verified |
 | EXT-02 | Pending | — | — | Not yet verified |
-| EXT-03 | Pending | — | — | Not yet verified |
+| EXT-03 | [keep-the-balance-at-30-after-duplicate-confirmation_test.md](../Tests/Kane/extensions/keep-the-balance-at-30-after-duplicate-confirmation_test.md) | — | [EXT-03_preexisting_ui_guard_green_20261024.evidence](packs/EXT-03_preexisting_ui_guard_green_20261024.evidence) | Double-tap Confirm kept the balance at 30 on the existing M2 baseline, which already blocks confirmation while busy. |
 | RECOV-01 | [show-failure-and-restore-credits-after-failed-activation_test.md](../Tests/Kane/extensions/show-failure-and-restore-credits-after-failed-activation_test.md) | [RECOV-01_red_20261024.evidence](packs/RECOV-01_red_20261024.evidence) | Pending | Kane confirmed that failed mock activation left the group balance at 30 instead of restoring 40. |
 | PRIV-01 | Pending | — | — | Not yet verified |
 | SHARE-01 | Pending | — | — | Not yet verified |
