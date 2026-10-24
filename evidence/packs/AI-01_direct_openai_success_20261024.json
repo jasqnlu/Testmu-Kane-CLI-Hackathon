@@ -1,0 +1,25 @@
+{
+  "observed_at": "2026-10-24T15:23:00-07:00",
+  "probe_id": "direct-openai-20261024-1523-01",
+  "probe": "direct authenticated POST to /functions/v1/draft-card",
+  "project_ref": "wwlbaihtcyyfxoesyytr",
+  "source_commit": "b709d07779357a62ddf093f65d8a5b32d6e4470b",
+  "request_facts": {
+    "minutes": 10,
+    "time_of_day": "afternoon",
+    "achievement": "organized study notes",
+    "extension_id": "[redacted]"
+  },
+  "response": {
+    "http_status": 200,
+    "source": "openai",
+    "draft": "[redacted]",
+    "draft_sha256": "53597f9bf94f4211d30f772757fa6ce75111bd6a98f2645f37d94ce643b897d5",
+    "draft_length": 71,
+    "private_reason_terms_detected": false,
+    "terms_checked": ["chemistry", "test anxiety", "anxiety"]
+  },
+  "credentials_recorded": false,
+  "private_reason_recorded": false,
+  "interpretation": "This confirms the authenticated deployed function obtained a real OpenAI draft after API credit was added. One direct sample only; it is not a Kane AI-01 or AI-02 result."
+}
