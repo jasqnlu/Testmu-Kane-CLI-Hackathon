@@ -95,8 +95,8 @@ enum WeaveTheme {
         var size: CGFloat {
             switch self {
             case .hero: 64
-            case .display: 34
-            case .title: 24
+            case .display: 30
+            case .title: 22
             case .headline: 17
             case .body: 16
             case .label: 13
@@ -116,8 +116,8 @@ enum WeaveTheme {
         var tracking: CGFloat {
             switch self {
             case .hero: -1.6
-            case .display: -1.0
-            case .title: -0.7
+            case .display: -0.9
+            case .title: -0.6
             case .headline: -0.2
             case .body, .label, .chip: 0
             }

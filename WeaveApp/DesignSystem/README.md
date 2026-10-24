@@ -12,7 +12,7 @@ Each file has `#Preview`s for light and dark mode with sample data.
 | --- | --- |
 | `WeaveTheme.Colors` | `background`, `surface`, `surfaceMuted`, `ink`, `inkSecondary`, `inkInverse`, `separator`, `brand` (deep green), `onBrand`, `liveCapsule`, `onPastel`. Each one switches between light and dark. |
 | `WeaveTheme.Pastel` | `mint` (private, active), `periwinkle` (share, confirm), `peach` / `pink` / `lime` (feed), `butter` (caution), `coral` (critical). The same in both modes, always with `onPastel` text. `Pastel.forMember(_:)` gives a stable color for a name. |
-| `WeaveTheme.TextStyle` | `hero` 64, `display` 34, `title` 24 (heavy); `headline` 17, `label` 13, `chip` 12 (semibold); `body` 16 (medium). Apply with `.weaveFont(_:)`. Each scales with Dynamic Type and uses tabular figures. |
+| `WeaveTheme.TextStyle` | `hero` 64, `display` 30, `title` 22 (heavy); `headline` 17, `label` 13, `chip` 12 (semibold); `body` 16 (medium). Apply with `.weaveFont(_:)`. Each scales with Dynamic Type and uses tabular figures. |
 | `WeaveTheme.Spacing` | `xxs` 4, `xs` 8, `tileGap` 10, `sm` 12, `md` 16, `lg` 20, `xl` 28, `xxl` 44 |
 | `WeaveTheme.Radius` | `field` 16, `banner` 22, `tile` 28, `sheet` 36. Always `.continuous`. |
 
