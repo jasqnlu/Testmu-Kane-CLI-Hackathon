@@ -37,7 +37,7 @@ All new lines sit together, right after the `A00000000000000000000010` (XCConfig
 | `D51600000000000000000018` | PBXFileReference | `DesignAssets.xcassets` (folder.assetcatalog), child of group `…0001` |
 | `D51600000000000000000021` … `28` | PBXBuildFile | one per file reference above, same order (`…21` → `…11`, … `…28` → `…18`). `…28` is in the Resources phase. |
 
-`README.md`, this file, and `Brand/` (logo source, SVG and PNG masters, web icons, presentation, usage guide) aren't in the project.
+`README.md`, this file, `design-plan.html`, and `Brand/` (logo source, SVG and PNG masters, web icons, presentation, usage guide) aren't in the project.
 
 ### Checking the merge
 

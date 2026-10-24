@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weave Design Plan</title>
+<style>
+  :root { --page: #E9E8E4; --page-ink: #111; --page-muted: #5E5E5E; --page-line: #D3D2CC; --code: #F4F3EF; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --page: #050506; --page-ink: #F2F2F2; --page-muted: #8E8E93; --page-line: #222225; --code: #121214; }
+  }
+  :root[data-theme="dark"] { --page: #050506; --page-ink: #F2F2F2; --page-muted: #8E8E93; --page-line: #222225; --code: #121214; }
+
+  /* ── Weave tokens ─────────────────────────── */
+  .t-light {
+    --bg: #F1F0EC; --surface: #FFFFFF; --surface-muted: #E6E5E0; --ink: #111111; --ink-2: #6B6B6B;
+    --ink-inverse: #FFFFFF; --line: #E2E1DC; --brand: #2D6A4F; --on-brand: #FFFFFF; --select: #2D6A4F;
+  }
+  .t-dark {
+    --bg: #0B0B0C; --surface: #1C1C1E; --surface-muted: #2A2A2D; --ink: #F5F5F5; --ink-2: #9A9A9F;
+    --ink-inverse: #111111; --line: #2E2E31; --brand: #2F7354; --on-brand: #FFFFFF; --select: #8EDCBC;
+  }
+  /* pastel tiles: same in both modes, always dark text on top */
+  :root { --periwinkle: #A3ADFF; --peach: #FFC98F; --mint: #8EDCBC; --pink: #F7A1CB; --butter: #F5D565; --coral: #F26B4F; --lime: #DDF59A; --on-pastel: #111111; }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--page-ink);
+    font: 16px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; }
+  .heavy { font-family: -apple-system, "SF Pro Display", system-ui, sans-serif; font-weight: 800; letter-spacing: -0.035em; }
+  main { max-width: 1120px; margin: 0 auto; padding: 56px 16px 120px; }
+
+  header h1 { font: 800 clamp(44px, 8vw, 84px)/0.95 -apple-system, "SF Pro Display", system-ui; letter-spacing: -0.045em; margin: 18px 0 18px; }
+  header p { color: var(--page-muted); max-width: 700px; margin: 0 0 10px; font-size: 17px; }
+  h2 { font: 800 34px/1.05 -apple-system, "SF Pro Display", system-ui; letter-spacing: -0.035em; margin: 88px 0 8px; }
+  h2 + .sub { color: var(--page-muted); margin: 0 0 26px; max-width: 740px; }
+  .pill { display: inline-block; font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 999px; background: var(--page-ink); color: var(--page); margin-right: 6px; }
+  .pill.ghost { background: transparent; color: var(--page-muted); border: 1px solid var(--page-line); }
+  code, pre { font: 13px/1.6 ui-monospace, "SF Mono", Menlo, monospace; }
+  pre { background: var(--code); border: 1px solid var(--page-line); border-radius: 16px; padding: 16px 18px; overflow-x: auto; margin: 0; }
+  .note { border-left: 3px solid var(--coral); padding: 4px 0 4px 14px; color: var(--page-muted); margin: 18px 0; max-width: 760px; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+
+  /* references */
+  .refs { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .ref { border-radius: 22px; padding: 18px 20px; color: var(--on-pastel); }
+  .ref b { display: block; font: 800 20px/1.1 -apple-system, system-ui; letter-spacing: -.03em; margin-bottom: 6px; }
+  .ref p { margin: 0; font-size: 14px; line-height: 1.45; }
+  .ref.skip { background: var(--code); color: var(--page-ink); border: 1px dashed var(--page-line); }
+
+  .tree { background: var(--code); border: 1px solid var(--page-line); border-radius: 16px; padding: 16px 18px; }
+  .tree div { font: 14px/1.9 ui-monospace, Menlo, monospace; }
+  .tree span { color: var(--page-muted); font-family: -apple-system, system-ui; font-size: 13px; margin-left: 10px; }
+
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .sw { border-radius: 18px; overflow: hidden; border: 1px solid var(--page-line); font-size: 12px; background: var(--code); }
+  .sw .chip { display: flex; height: 58px; }
+  .sw .chip i { flex: 1; }
+  .sw .meta { padding: 8px 12px 10px; }
+  .sw b { display: block; font-size: 13px; }
+  .sw small { color: var(--page-muted); font-family: ui-monospace, Menlo, monospace; }
+  .pastels { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; margin-top: 12px; }
+  .pastels div { border-radius: 18px; height: 92px; padding: 12px 14px; color: var(--on-pastel); display: flex; flex-direction: column; justify-content: space-between; }
+  .pastels b { font: 800 17px/1 -apple-system, system-ui; letter-spacing: -.03em; }
+  .pastels small { font-family: ui-monospace, Menlo, monospace; font-size: 11px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  td, th { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--page-line); vertical-align: middle; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--page-muted); font-weight: 600; }
+  .bar { height: 12px; background: var(--page-ink); border-radius: 3px; }
+  .radius-demo { width: 64px; height: 40px; border: 2px solid var(--page-ink); }
+
+  /* component sections */
+  .comp { border-top: 1px solid var(--page-line); padding-top: 30px; margin-top: 44px; }
+  .comp h3 { font: 800 26px/1.1 -apple-system, "SF Pro Display", system-ui; letter-spacing: -.03em; margin: 10px 0 6px; }
+  .comp .why { color: var(--page-muted); margin: 0 0 20px; max-width: 780px; }
+  .stage { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 16px; margin-bottom: 16px; }
+  .phone { background: var(--bg); color: var(--ink); border-radius: 36px; padding: 22px 14px; min-height: 170px;
+    display: flex; flex-direction: column; gap: 10px; justify-content: center; position: relative; overflow: hidden; }
+  .t-light.phone { box-shadow: inset 0 0 0 1px var(--line); }
+  .phone .mode { position: absolute; top: 12px; right: 18px; font-size: 11px; color: var(--ink-2); letter-spacing: .06em; text-transform: uppercase; font-weight: 600; }
+
+  /* tiles */
+  .tile { background: var(--surface); border-radius: 28px; padding: 20px; position: relative; overflow: hidden; }
+  .bento { display: grid; grid-template-columns: 1.25fr 1fr; gap: 10px; }
+  .eyebrow { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+  .amount { margin: 8px 0 2px; line-height: .95; font-variant-numeric: tabular-nums; }
+  .amount .n { font: 800 64px/0.95 -apple-system, "SF Pro Display", system-ui; letter-spacing: -0.05em; }
+  .amount .u { font: 700 22px/1 -apple-system, system-ui; letter-spacing: -0.02em; }
+  .caption { font-size: 14px; color: var(--ink-2); line-height: 1.35; }
+  .meter { display: flex; gap: 4px; margin-top: 16px; }
+  .meter i { flex: 1; height: 26px; border-radius: 6px; background: var(--surface-muted); }
+  .meter i.on { background: var(--ink); }
+  .tile.brand { background: var(--brand); color: var(--on-brand); display: flex; flex-direction: column; justify-content: space-between; }
+  .tile.brand .t { font: 800 24px/1.05 -apple-system, system-ui; letter-spacing: -.035em; }
+  .tile.brand .s { font-size: 14px; opacity: .85; margin-top: 4px; }
+  .plus { font: 200 64px/0.8 -apple-system, system-ui; align-self: flex-end; }
+  .faces { display: flex; margin-top: 14px; }
+  .face { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 800 12px -apple-system, system-ui; color: var(--on-pastel);
+    border: 2px solid var(--surface); margin-left: -8px; }
+  .face:first-child { margin-left: 0; }
+
+  /* buttons */
+  .btn { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 58px; border-radius: 999px;
+    font: 600 17px -apple-system, system-ui; border: 0; width: 100%; padding: 0 8px 0 24px; }
+  .btn.center { justify-content: center; padding: 0 24px; }
+  .btn.primary { background: var(--ink); color: var(--ink-inverse); }
+  .btn.secondary { background: var(--surface-muted); color: var(--ink); }
+  .btn .go { width: 42px; height: 42px; border-radius: 50%; background: var(--ink-inverse); color: var(--ink); display: grid; place-items: center; }
+  .btn.disabled { opacity: .5; }
+  .spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+  .row { display: flex; gap: 10px; }
+  .row > * { flex: 1; }
+
+  /* sheet */
+  .sheet { background: var(--surface); border-radius: 36px 36px 0 0; padding: 10px 18px 22px; margin: 0 -14px -22px; }
+  .grabber { width: 38px; height: 5px; border-radius: 3px; background: var(--surface-muted); margin: 0 auto 18px; }
+  .sheet h4 { margin: 0 0 4px; font: 800 26px/1.05 -apple-system, system-ui; letter-spacing: -.035em; }
+  .summary { background: var(--periwinkle); color: var(--on-pastel); border-radius: 24px; padding: 22px 20px; margin: 16px 0;
+    font: 800 28px/1.05 -apple-system, "SF Pro Display", system-ui; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+  .stack { display: flex; flex-direction: column; gap: 10px; }
+
+  /* privacy stacked cards */
+  .deck { display: flex; flex-direction: column; }
+  .pcard { border-radius: 28px; padding: 20px 20px 22px; color: var(--on-pastel); position: relative; }
+  .pcard + .pcard { margin-top: -18px; padding-top: 34px; }
+  .pcard.private { background: var(--mint); z-index: 2; box-shadow: 0 10px 24px rgba(0,0,0,.18); }
+  .pcard.share { background: var(--periwinkle); z-index: 1; }
+  .pcard.unselected { filter: saturate(.55); }
+  .t-dark .pcard.unselected { opacity: .72; }
+  .pcard .head { display: flex; align-items: center; gap: 10px; }
+  .pcard b { font: 800 24px/1.05 -apple-system, system-ui; letter-spacing: -.035em; }
+  .pcard p { margin: 8px 0 0; font-size: 14px; max-width: 230px; line-height: 1.4; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 11px; border-radius: 999px; font: 600 12px -apple-system, system-ui; }
+  .chip.dark { background: #111; color: #fff; }
+  .chip.light { background: rgba(255,255,255,.7); color: #111; }
+  .chip.muted { background: var(--surface-muted); color: var(--ink); }
+  .knob { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: #fff; color: #111; }
+  .pcard.share .knob { top: calc(50% + 8px); background: rgba(255,255,255,.55); }
+  .knob.empty::after { content: ""; width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(17,17,17,.4); }
+
+  /* feed */
+  .fcard { border-radius: 28px; padding: 18px 18px 20px; color: var(--on-pastel); }
+  .fcard .top { display: flex; align-items: center; gap: 10px; }
+  .fcard .av { width: 38px; height: 38px; border-radius: 50%; background: #111; color: #fff; display: grid; place-items: center; font: 800 14px -apple-system, system-ui; }
+  .fcard b { font: 800 19px/1 -apple-system, system-ui; letter-spacing: -.03em; }
+  .fcard .time { margin-left: auto; font-size: 12px; font-weight: 600; opacity: .7; }
+  .fcard p { margin: 12px 0 14px; font-size: 16px; line-height: 1.4; font-weight: 500; }
+  .fcard .tags { display: flex; gap: 6px; }
+
+  /* status */
+  .live { display: flex; align-items: center; gap: 12px; background: #111; color: #fff; border-radius: 999px; padding: 8px 8px 8px 18px; }
+  .t-dark .live { background: var(--surface); }
+  .live .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 5px rgba(142,220,188,.22); flex: none; }
+  .live b { font-weight: 600; font-size: 15px; flex: 1; }
+  .live .chip { background: var(--mint); color: #111; height: 32px; }
+  .block { border-radius: 22px; padding: 14px 18px; color: var(--on-pastel); display: flex; gap: 12px; align-items: center; }
+  .block .gl { width: 30px; height: 30px; border-radius: 50%; background: #111; color: #fff; display: grid; place-items: center; font-weight: 800; flex: none; font-size: 14px; }
+  .block b { display: block; font: 700 15px/1.25 -apple-system, system-ui; }
+  .block span { font-size: 13px; opacity: .8; }
+
+  /* segmented (shown for context only) */
+  svg.i { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+  ul.checklist { padding-left: 20px; }
+  ul.checklist li { margin: 10px 0; max-width: 820px; }
+  footer { margin-top: 80px; color: var(--page-muted); font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <span class="pill">design-system branch</span><span class="pill ghost">Plan v2: based on your references</span>
+  <h1>Weave,<br>bolder.</h1>
+  <p>The new direction takes four things from your references: heavy display type, big rounded tiles laid out in a grid, solid pastel color blocks, and dark mode as the main mode. Weave's deep green stays as the brand color.</p>
+  <p>Each component below appears twice, light and dark, the same way each SwiftUI <code>#Preview</code> will.</p>
+</header>
+
+<h2>What I took from each reference</h2>
+<p class="sub">I kept the look and left out the game mechanics. Weave asks friends to cover each other's time, so ranking them against each other would work against the product.</p>
+<div class="refs">
+  <div class="ref" style="background:var(--mint)"><b>Account / bonuses</b><p>Heavy black type, a big number with a small label under it ("1926 / bonuses"), white tiles next to one deep-green tile. This becomes the <b>BalanceCard</b>.</p></div>
+  <div class="ref" style="background:var(--peach)"><b>Mood picker</b><p>Overlapping colored cards with a round button on each. This becomes <b>PrivacyChoice</b>, with Keep Private as the card on top.</p></div>
+  <div class="ref" style="background:var(--periwinkle)"><b>Dark bento grids</b><p>Near-black background, charcoal tiles, tight gaps, small pill tags ("15 min", "Evening"). These set the dark-mode tokens and <b>WeaveChip</b>.</p></div>
+  <div class="ref" style="background:var(--pink)"><b>Podcast insights</b><p>A grey sentence with bold white numbers, and a capsule button. This sets the Secondary button and the type contrast.</p></div>
+  <div class="ref" style="background:var(--butter)"><b>Top Artists story</b><p>A bold editorial feel with yellow accents. Yellow becomes the <b>caution</b> color.</p></div>
+  <div class="ref" style="background:var(--coral)"><b>Leaderboard / lessons</b><p>Saturated stacked cards and white and black capsule buttons. This sets the Primary button. Coral becomes the <b>critical</b> color.</p></div>
+  <div class="ref skip"><b>Left out on purpose</b><p>Points, crowns, ranks, streak flames, badge collections. Those make it a contest, which goes against Weave's calm and private-by-default tone.</p></div>
+</div>
+
+<h2>Files</h2>
+<div class="tree">
+  <div>WeaveApp/DesignSystem/</div>
+  <div>├── WeaveTheme.swift <span>colors, pastels, type scale, spacing, radius, WeaveChip</span></div>
+  <div>├── BalanceCard.swift <span>Group screen</span></div>
+  <div>├── WeaveButtons.swift <span>PrimaryButton, SecondaryButton + ButtonStyles</span></div>
+  <div>├── ConfirmSheetStyle.swift <span>Confirm sheet</span></div>
+  <div>├── PrivacyChoice.swift <span>Privacy choice</span></div>
+  <div>├── FeedCard.swift <span>Feed</span></div>
+  <div>├── StatusBanner.swift <span>Extension banner and inline errors</span></div>
+  <div>└── README.md</div>
+</div>
+
+<h2>Color</h2>
+<p class="sub">Neutral colors switch between light and dark. Each swatch shows light on the left and dark on the right.</p>
+<div class="swatches">
+  <div class="sw"><div class="chip"><i style="background:#F1F0EC"></i><i style="background:#0B0B0C"></i></div><div class="meta"><b>background</b><small>#F1F0EC / #0B0B0C</small></div></div>
+  <div class="sw"><div class="chip"><i style="background:#FFFFFF"></i><i style="background:#1C1C1E"></i></div><div class="meta"><b>surface</b><small>#FFFFFF / #1C1C1E</small></div></div>
+  <div class="sw"><div class="chip"><i style="background:#E6E5E0"></i><i style="background:#2A2A2D"></i></div><div class="meta"><b>surfaceMuted</b><small>#E6E5E0 / #2A2A2D</small></div></div>
+  <div class="sw"><div class="chip"><i style="background:#111111"></i><i style="background:#F5F5F5"></i></div><div class="meta"><b>ink</b><small>#111111 / #F5F5F5</small></div></div>
+  <div class="sw"><div class="chip"><i style="background:#6B6B6B"></i><i style="background:#9A9A9F"></i></div><div class="meta"><b>inkSecondary</b><small>#6B6B6B / #9A9A9F</small></div></div>
+  <div class="sw"><div class="chip"><i style="background:#2D6A4F"></i><i style="background:#2F7354"></i></div><div class="meta"><b>brand</b><small>#2D6A4F / #2F7354</small></div></div>
+</div>
+<p class="sub" style="margin-top:22px">The pastel tiles are the same in both modes, with near-black text on top (contrast 7:1 or higher). Each color has one job, so a color always means the same thing.</p>
+<div class="pastels">
+  <div style="background:var(--mint)"><b>mint</b><small>#8EDCBC · private, active</small></div>
+  <div style="background:var(--periwinkle)"><b>periwinkle</b><small>#A3ADFF · share, confirm</small></div>
+  <div style="background:var(--peach)"><b>peach</b><small>#FFC98F · feed</small></div>
+  <div style="background:var(--pink)"><b>pink</b><small>#F7A1CB · feed</small></div>
+  <div style="background:var(--lime)"><b>lime</b><small>#DDF59A · feed</small></div>
+  <div style="background:var(--butter)"><b>butter</b><small>#F5D565 · caution</small></div>
+  <div style="background:var(--coral)"><b>coral</b><small>#F26B4F · critical</small></div>
+</div>
+<p class="note">Feed cards get a color from the member's name, using a stable hash. Alice is always peach and Bob is always pink, on every device and in every Kane screenshot.</p>
+
+<h2>Typography</h2>
+<p class="sub">SF Pro in heavy weights with tight letter spacing. No custom font file, so the Xcode project needs no resource changes. Every style is tied to a Dynamic Type text style, so it still scales with the user's text-size setting.</p>
+<table>
+  <tr><th>Token</th><th>Sample</th><th>Spec</th></tr>
+  <tr><td><code>hero</code></td><td class="heavy" style="font-size:64px;line-height:.95;letter-spacing:-.05em">40</td><td>64 heavy, −2.5% tracking, tabular figures · relative to largeTitle</td></tr>
+  <tr><td><code>display</code></td><td class="heavy" style="font-size:34px;line-height:1">Study Group</td><td>34 heavy, −3% · largeTitle</td></tr>
+  <tr><td><code>title</code></td><td class="heavy" style="font-size:24px">Keep Private</td><td>24 heavy, −3% · title2</td></tr>
+  <tr><td><code>headline</code></td><td style="font-size:17px;font-weight:600">Request 10 minutes</td><td>17 semibold · headline</td></tr>
+  <tr><td><code>body</code></td><td style="font-size:16px;font-weight:500">Took 10 extra minutes to wrap up flashcards.</td><td>16 medium · callout</td></tr>
+  <tr><td><code>label</code></td><td style="font-size:13px;font-weight:600;color:var(--page-muted)">Group balance</td><td>13 semibold, secondary ink · footnote</td></tr>
+  <tr><td><code>chip</code></td><td><span class="chip" style="background:var(--page-ink);color:var(--page)">10 min</span></td><td>12 semibold in a capsule · caption</td></tr>
+</table>
+
+<h2>Spacing and corners</h2>
+<div class="grid2">
+  <table>
+    <tr><th>Spacing</th><th>pt</th><th></th></tr>
+    <tr><td><code>xxs</code></td><td>4</td><td><div class="bar" style="width:4px"></div></td></tr>
+    <tr><td><code>xs</code></td><td>8</td><td><div class="bar" style="width:8px"></div></td></tr>
+    <tr><td><code>tileGap</code></td><td>10</td><td><div class="bar" style="width:10px"></div></td></tr>
+    <tr><td><code>sm</code></td><td>12</td><td><div class="bar" style="width:12px"></div></td></tr>
+    <tr><td><code>md</code></td><td>16</td><td><div class="bar" style="width:16px"></div></td></tr>
+    <tr><td><code>lg</code></td><td>20</td><td><div class="bar" style="width:20px"></div></td></tr>
+    <tr><td><code>xl</code></td><td>28</td><td><div class="bar" style="width:28px"></div></td></tr>
+    <tr><td><code>xxl</code></td><td>44</td><td><div class="bar" style="width:44px"></div></td></tr>
+  </table>
+  <table>
+    <tr><th>Radius</th><th>pt</th><th>Used for</th></tr>
+    <tr><td><code>field</code></td><td>16</td><td><div class="radius-demo" style="border-radius:16px"></div></td></tr>
+    <tr><td><code>banner</code></td><td>22</td><td>caution and critical banners</td></tr>
+    <tr><td><code>tile</code></td><td>28</td><td>balance, privacy and feed cards</td></tr>
+    <tr><td><code>sheet</code></td><td>36</td><td>top corners of the confirm sheet</td></tr>
+    <tr><td><code>capsule</code></td><td>∞</td><td>buttons, chips, live banner</td></tr>
+  </table>
+</div>
+<p class="note">All rounded corners use <code>.continuous</code>, Apple's smoother curve. At 28pt and larger it's what makes the tiles look like iOS rather than web cards.</p>
+
+<h2>Components</h2>
+<p class="sub">Every user-visible string is still a parameter, and each Kane-checked string still renders as <b>one</b> text element. Components take an optional <code>accessibilityIdentifier</code> so IDs like <code>group.balance</code> keep working.</p>
+
+<!-- BalanceCard -->
+<section class="comp">
+  <span class="pill">Group screen</span>
+  <h3>BalanceCard</h3>
+  <p class="why">The number is the main thing on the card: a 64pt heavy "40" with "credits" on the same line in a smaller size. A row of segments shows how much of the budget is left, like a ruler and not a countdown. Member initials sit along the bottom. The optional brand-green tile next to it is the same component with <code>style: .brand</code>.</p>
+  <div class="stage">
+    <div class="phone t-light"><span class="mode">Light</span>
+      <div class="bento">
+        <div class="tile"><div class="eyebrow">Group balance</div><div class="amount"><span class="n">40</span><span class="u"> credits</span></div><div class="caption">Shared by Study Group</div>
+          <div class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+          <div class="faces"><span class="face" style="background:var(--peach)">A</span><span class="face" style="background:var(--pink)">B</span><span class="face" style="background:var(--lime)">C</span></div></div>
+        <div class="tile brand"><div><div class="t">Need more time?</div><div class="s">10 min · 10 credits</div></div><div class="plus">+</div></div>
+      </div>
+    </div>
+    <div class="phone t-dark"><span class="mode">Dark</span>
+      <div class="bento">
+        <div class="tile"><div class="eyebrow">Group balance</div><div class="amount"><span class="n">30</span><span class="u"> credits</span></div><div class="caption">Shared by Study Group</div>
+          <div class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+          <div class="faces"><span class="face" style="background:var(--peach)">A</span><span class="face" style="background:var(--pink)">B</span><span class="face" style="background:var(--lime)">C</span></div></div>
+        <div class="tile brand"><div><div class="t">Need more time?</div><div class="s">10 min · 10 credits</div></div><div class="plus">+</div></div>
+      </div>
+    </div>
+  </div>
+<pre>BalanceCard(
+    label: "Group balance",
+    amount: "\(group.balance) credits",     // one string, shown as big "40" + small " credits"
+    caption: "Shared by \(group.groupName)", // optional
+    fraction: 0.75,                          // optional segment meter, 0...1
+    memberNames: ["Alice", "Bob", "Charlie"],// optional initials row
+    style: .standard,                        // .standard | .brand
+    amountIdentifier: "group.balance"
+)</pre>
+</section>
+
+<!-- Buttons -->
+<section class="comp">
+  <span class="pill">All screens</span>
+  <h3>PrimaryButton and SecondaryButton</h3>
+  <p class="why">Capsule buttons like in your references. Primary is solid ink (black in light mode, white in dark), with an optional round arrow at the end. Secondary is a quiet grey capsule. Both are 58pt tall. While loading, a button keeps its size and ignores more taps, which helps with the double-tap Confirm case (EXT-03).</p>
+  <div class="stage">
+    <div class="phone t-light"><span class="mode">Light</span>
+      <div class="stack">
+        <button class="btn primary">Request 10 minutes <span class="go"><svg class="i" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></span></button>
+        <div class="row"><button class="btn secondary center">Not now</button><button class="btn primary center disabled"><span class="spinner"></span>Confirming…</button></div>
+      </div>
+    </div>
+    <div class="phone t-dark"><span class="mode">Dark</span>
+      <div class="stack">
+        <button class="btn primary">Request 10 minutes <span class="go"><svg class="i" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></span></button>
+        <div class="row"><button class="btn secondary center">Not now</button><button class="btn primary center disabled"><span class="spinner"></span>Confirming…</button></div>
+      </div>
+    </div>
+  </div>
+<pre>PrimaryButton("Request 10 minutes", showsArrow: true) { … }
+PrimaryButton("Confirm", isLoading: store.isConfirming, loadingTitle: "Confirming…") { … }
+SecondaryButton("Not now") { … }
+
+Button("Retry") { … }.buttonStyle(.weavePrimary)   // for existing Button calls</pre>
+</section>
+
+<!-- Confirm sheet -->
+<section class="comp">
+  <span class="pill">Confirm sheet</span>
+  <h3>ConfirmSheetStyle</h3>
+  <p class="why">The cost appears as a large periwinkle block, so "10 minutes · 10 credits" is the first thing you read and nothing is spent until you tap Confirm (EXT-01). A modifier sets the medium sheet height, 36pt corners and the grabber.</p>
+  <div class="stage">
+    <div class="phone t-light" style="justify-content:flex-end;min-height:390px"><span class="mode">Light</span>
+      <div class="sheet"><div class="grabber"></div><h4>Take a little<br>more time?</h4><div class="caption">It comes from the group's shared balance.</div>
+        <div class="summary">10 minutes · 10 credits</div>
+        <div class="stack"><button class="btn primary center">Confirm</button><button class="btn secondary center">Cancel</button></div></div>
+    </div>
+    <div class="phone t-dark" style="justify-content:flex-end;min-height:390px"><span class="mode">Dark</span>
+      <div class="sheet"><div class="grabber"></div><h4>Take a little<br>more time?</h4><div class="caption">It comes from the group's shared balance.</div>
+        <div class="summary">10 minutes · 10 credits</div>
+        <div class="stack"><button class="btn primary center">Confirm</button><button class="btn secondary center">Cancel</button></div></div>
+    </div>
+  </div>
+<pre>.sheet(isPresented: $showConfirm) {
+    ConfirmSheetStyle(
+        title: "Take a little more time?",
+        message: "It comes from the group's shared balance.",
+        summary: "10 minutes · 10 credits",
+        confirmTitle: "Confirm", cancelTitle: "Cancel",
+        isConfirming: store.isConfirming,
+        onConfirm: { … }, onCancel: { … }
+    )
+    .weaveSheetPresentation()
+}</pre>
+</section>
+
+<!-- Privacy -->
+<section class="comp">
+  <span class="pill">Privacy choice</span>
+  <h3>PrivacyChoice</h3>
+  <p class="why">Two overlapping cards, based on the mood picker. Keep Private is the mint card on top: it has a shadow, a filled check and a black "Default" chip, and it's selected when the screen opens. Share with Group sits behind it in periwinkle and comes forward when tapped. Each card is a full-size tap target (well over 44pt), and VoiceOver reads them as a two-option radio group.</p>
+  <div class="stage">
+    <div class="phone t-light"><span class="mode">Light</span>
+      <div class="deck">
+        <div class="pcard private"><div class="head"><b>Keep Private</b><span class="chip dark"><svg class="i" style="width:12px;height:12px" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Default</span></div><p>Your reason stays with you. Nothing is posted.</p><span class="knob"><svg class="i" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></span></div>
+        <div class="pcard share unselected"><div class="head"><b>Share with Group</b></div><p>Review a short card before anything is posted.</p><span class="knob empty"></span></div>
+      </div>
+    </div>
+    <div class="phone t-dark"><span class="mode">Dark</span>
+      <div class="deck">
+        <div class="pcard private"><div class="head"><b>Keep Private</b><span class="chip dark"><svg class="i" style="width:12px;height:12px" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Default</span></div><p>Your reason stays with you. Nothing is posted.</p><span class="knob"><svg class="i" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></span></div>
+        <div class="pcard share unselected"><div class="head"><b>Share with Group</b></div><p>Review a short card before anything is posted.</p><span class="knob empty"></span></div>
+      </div>
+    </div>
+  </div>
+<pre>@State var choice: PrivacyChoice.Option = .keepPrivate
+
+PrivacyChoice(
+    selection: $choice,
+    privateTitle: "Keep Private",
+    privateDetail: "Your reason stays with you. Nothing is posted.",
+    shareTitle: "Share with Group",
+    shareDetail: "Review a short card before anything is posted.",
+    defaultBadge: "Default"
+)</pre>
+</section>
+
+<!-- Feed -->
+<section class="comp">
+  <span class="pill">Feed</span>
+  <h3>FeedCard</h3>
+  <p class="why">A solid pastel tile per post, with the color picked from the member's name. It shows a black initials avatar, the name in heavy type, the time, the short text and optional tags like "10 min". No likes or reaction counts.</p>
+  <div class="stage">
+    <div class="phone t-light"><span class="mode">Light</span>
+      <div class="fcard" style="background:var(--peach)"><div class="top"><span class="av">A</span><b>Alice</b><span class="time">2:15 PM</span></div><p>Took 10 extra minutes to wrap up flashcards, then back to the problem set.</p><div class="tags"><span class="chip dark">10 min</span><span class="chip light">Evening</span></div></div>
+      <div class="fcard" style="background:var(--pink)"><div class="top"><span class="av">B</span><b>Bob</b><span class="time">1:40 PM</span></div><p>Needed a short reset after a long reading block.</p><div class="tags"><span class="chip dark">10 min</span></div></div>
+    </div>
+    <div class="phone t-dark"><span class="mode">Dark</span>
+      <div class="fcard" style="background:var(--peach)"><div class="top"><span class="av">A</span><b>Alice</b><span class="time">2:15 PM</span></div><p>Took 10 extra minutes to wrap up flashcards, then back to the problem set.</p><div class="tags"><span class="chip dark">10 min</span><span class="chip light">Evening</span></div></div>
+      <div class="fcard" style="background:var(--lime)"><div class="top"><span class="av">C</span><b>Charlie</b><span class="time">Yesterday</span></div><p>Used a little extra time to finish a group call.</p><div class="tags"><span class="chip dark">10 min</span></div></div>
+    </div>
+  </div>
+<pre>FeedCard(
+    memberName: "Alice",
+    text: card.body,
+    timestamp: "2:15 PM",   // optional, the screen formats it
+    tags: ["10 min"]        // optional
+)</pre>
+</section>
+
+<!-- Status -->
+<section class="comp">
+  <span class="pill">Extension banner</span>
+  <h3>StatusBanner</h3>
+  <p class="why"><code>.active</code> is a dark capsule with a mint dot and a time chip, styled like an iOS Live Activity, for "Extension active, ends at HH:MM" (EXT-02). <code>.caution</code> (butter) and <code>.critical</code> (coral) are solid color blocks for "Not enough group credits" (CREDIT-02) and "Couldn't start extension" (RECOV-01).</p>
+  <div class="stage">
+    <div class="phone t-light"><span class="mode">Light</span>
+      <div class="live"><span class="dot"></span><b>Extension active, ends at 14:30</b><span class="chip">10 min</span></div>
+      <div class="block" style="background:var(--butter)"><span class="gl">!</span><div><b>Not enough group credits</b></div></div>
+      <div class="block" style="background:var(--coral)"><span class="gl">×</span><div><b>Couldn't start extension</b><span>No credits were spent.</span></div></div>
+    </div>
+    <div class="phone t-dark"><span class="mode">Dark</span>
+      <div class="live"><span class="dot"></span><b>Extension active, ends at 14:30</b><span class="chip">10 min</span></div>
+      <div class="block" style="background:var(--butter)"><span class="gl">!</span><div><b>Not enough group credits</b></div></div>
+      <div class="block" style="background:var(--coral)"><span class="gl">×</span><div><b>Couldn't start extension</b><span>No credits were spent.</span></div></div>
+    </div>
+  </div>
+<pre>StatusBanner(
+    kind: .active,                                 // .active | .info | .caution | .critical
+    title: "Extension active, ends at \(endTime)",
+    detail: nil,                                   // optional second line
+    chip: "10 min",                                // optional, .active only
+    identifier: "extension.banner"
+)</pre>
+</section>
+
+<h2>How I'll build it</h2>
+<ul class="checklist">
+  <li><b>One text element per Kane string.</b> For BalanceCard, "40 credits" is passed as one string. The component splits it only for display, joining two <code>Text</code> views with <code>+</code>, so VoiceOver and Kane still read exactly "40 credits".</li>
+  <li><b>Colors in code.</b> Each token is a <code>Color</code> built from a <code>UIColor</code> that changes with light and dark mode. No asset catalog and no custom fonts, so the Xcode project gets no resource entries.</li>
+  <li><b>No hard-coded user text.</b> Titles, badges, chips, summaries and tags are all parameters. Avatar initials and pastel colors are computed from <code>memberName</code>.</li>
+  <li><b>Previews.</b> Each component file gets <code>#Preview("Light")</code> and <code>#Preview("Dark")</code> with Alice, Bob and Charlie, 40 → 30 credits, and "10 minutes · 10 credits".</li>
+  <li><b>Accessibility.</b> Dynamic Type on every style, each card read as one VoiceOver element, PrivacyChoice as a radio group, tap targets of at least 44pt, and Reduce Motion respected for the card animation.</li>
+  <li><b>Existing <code>WeaveStyle</code> stays as it is.</b> It's in <code>WeaveApp.swift</code>, which is out of scope. The feature screens can move to <code>WeaveTheme</code> later.</li>
+  <li><b>Build check only:</b> <code>xcodebuild -scheme Weave -sdk iphonesimulator -configuration Debug -derivedDataPath build-design build</code>. No Kane runs, no simulator, no Scripts/.</li>
+</ul>
+
+<h2>Xcode project change</h2>
+<p class="sub"><code>project.pbxproj</code> does <b>not</b> use <code>PBXFileSystemSynchronizedRootGroup</code>, so the files have to be registered by hand. Lines are only added, never changed or removed:</p>
+<table>
+  <tr><th>Section</th><th>Change</th></tr>
+  <tr><td><code>PBXBuildFile</code></td><td>+7 lines, one per Swift file</td></tr>
+  <tr><td><code>PBXFileReference</code></td><td>+8 lines (7 Swift + README.md, not compiled)</td></tr>
+  <tr><td><code>PBXGroup</code></td><td>+1 new <code>DesignSystem</code> group; +1 child line in the <code>WeaveApp</code> group</td></tr>
+  <tr><td><code>PBXSourcesBuildPhase</code></td><td>+7 lines in the app target's Sources list</td></tr>
+</table>
+
+<h2>Commits</h2>
+<pre>design: add WeaveTheme tokens (color, pastels, type, spacing, radius)
+design: add BalanceCard, buttons, ConfirmSheetStyle
+design: add PrivacyChoice, FeedCard, StatusBanner
+design: add DesignSystem README
+
+Authored by Claude Code.
+Co-Authored-By: Claude Opus 5.5 (1M context) &lt;noreply@anthropic.com&gt;</pre>
+<p class="note">All on <code>design-system</code>. No merge into main.</p>
+
+<footer>Weave design plan v2 · no Swift written yet</footer>
+</main>
+</body>
+</html>

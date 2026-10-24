@@ -118,7 +118,7 @@ BalanceCard(
 )
 ```
 
-See [MERGE_NOTES.md](MERGE_NOTES.md) for merging with main. The logo, app icon source, and brand usage rules are in [Brand/BRAND.md](Brand/BRAND.md).
+See [MERGE_NOTES.md](MERGE_NOTES.md) for merging with main. The logo, app icon source, and brand usage rules are in [Brand/BRAND.md](Brand/BRAND.md). The original visual plan for this design system is [design-plan.html](design-plan.html); open it in a browser.
 
 ## Xcode project
 
