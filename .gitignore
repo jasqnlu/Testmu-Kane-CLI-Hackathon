@@ -1,1 +1,30 @@
 .DS_Store
+
+# Build products
+build/
+builds/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+.DS_Store
+
+# Local credentials and configuration
+.env
+.env.*
+!.env.example
+Config/Secrets.xcconfig
+.testmuai/variables/
+.testmuai/auth*
+.testmuai/credentials*
+.testmuai/config.json
+.supabase/
+Supabase/.temp/
+Supabase/.branches/
+# kane-cli context store: shared through a location, never merged with git
+.context/
+
+# Kane working outputs; selected tests, caches and sealed packs live in Tests/ and evidence/
+.testmuai/tests/
+.testmuai/evidence/
+.testmuai/testruns/
+.testmuai/runs/

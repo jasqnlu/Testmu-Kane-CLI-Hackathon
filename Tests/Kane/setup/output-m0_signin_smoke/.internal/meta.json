@@ -1,0 +1,26 @@
+{
+  "commit_id": "6c7afe7a-e8f8-4dee-83ef-785078c22542",
+  "test_id": "23425c47-00e3-4e57-b693-30381abcb43d",
+  "testcase_id": "01M5QJ0RC6DN9Y24VZ5V4WR6AA",
+  "project_id": "01M5P8CE37CJWXR7V5N86YABJR",
+  "folder_id": "01M5P8CEMKND2NRKAJ5DF3PR9Q",
+  "org_id": "3387873",
+  "session_name": "m0_signin_smoke",
+  "executions": [
+    {
+      "execution_id": "d9e4ce5f-6345-4347-b479-75135102aa1c",
+      "run_kind": "replay",
+      "status": "passed",
+      "valid": true,
+      "at": "2026-10-24T18:20:07.011Z"
+    },
+    {
+      "execution_id": "8fdf0829-4d71-44c0-bf0e-39ca22265a05",
+      "run_kind": "replay",
+      "status": "passed",
+      "valid": true,
+      "uploaded": true,
+      "at": "2026-10-24T18:21:16.411Z"
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+{"type":"error","v":1,"verb":"extract","message":"error: extract failed: EPERM: operation not permitted, mkdir '/Users/jasonlu/.testmuai/kaneai/assurance/ctx-acd6557a55e5/logs'"}
+{"type":"done","v":1,"verb":"extract","status":"error","exit_code":1}

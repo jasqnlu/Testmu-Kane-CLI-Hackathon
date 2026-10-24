@@ -1,0 +1,6 @@
+could not open Simulator.app (Unable to find application named 'Simulator'); the device is booted and the run continues headless
+unpacking /Users/jasonlu/.testmuai/kaneai/mobile/apps/4a19d5e8204f3b96634c51f7033c8461a868b1720b41f75900ef73a3038d8280/Weave.zip…
+installing /var/folders/nr/s911fg014551w73zmxz9y7d80000gn/T/kane-app-unzip-tQ5q45/Weave.app on iPhone 17 Pro…
+coverage: 0% from this run, which ran no designed test
+  for coverage so far, run: kane-cli cover
+evidence: view locally with `kane-cli evidence serve /Users/jasonlu/.testmuai/kaneai/sessions/ba6103fd-706b-4f51-981c-f9a4ad6e6aeb/evidence/d9e4ce5f-6345-4347-b479-75135102aa1c.evidence`

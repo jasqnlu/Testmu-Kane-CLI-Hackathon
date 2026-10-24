@@ -1,0 +1,19 @@
+{"type":"run_start","v":1,"verb":"extract","mode":"agent","trace":"/Users/jasonlu/.testmuai/kaneai/assurance/ctx-acd6557a55e5/logs/extract-as-20261024T1809-6cc5ucwu.log","session":"as-20261024T1809-6cc5ucwu"}
+{"type":"corpus","v":1,"verb":"extract","sources":[{"source_id":"acceptance-criteria","cid":"sha256:46992d2a38aee293597cdaeab07e4e0a8259f985ad361e2b1c536a20550a53b6"}],"skipped":[]}
+{"type":"source_start","v":1,"verb":"extract","source_id":"acceptance-criteria","cid":"sha256:46992d2a38aee293597cdaeab07e4e0a8259f985ad361e2b1c536a20550a53b6","index":1,"total":1,"resumed":false}
+{"type":"agent_activity","v":1,"verb":"extract","kind":"tool","label":"→ list sources…"}
+{"type":"agent_activity","v":1,"verb":"extract","kind":"tool","label":"→ trace provenance…"}
+{"type":"agent_activity","v":1,"verb":"extract","kind":"tool","label":"→ search graph…"}
+{"type":"usage","v":1,"verb":"extract","credits":4.24,"total_credits":4.24}
+{"type":"agent_activity","v":1,"verb":"extract","kind":"decision","label":"corpus roster"}
+{"type":"agent_activity","v":1,"verb":"extract","kind":"tool","label":"✓ list sources"}
+{"type":"agent_activity","v":1,"verb":"extract","kind":"decision","label":"checking provenance"}
+{"type":"agent_activity","v":1,"verb":"extract","kind":"tool","label":"✓ trace provenance"}
+{"type":"agent_activity","v":1,"verb":"extract","kind":"decision","label":"checking a possible duplicate"}
+{"type":"agent_activity","v":1,"verb":"extract","kind":"tool","label":"✓ search graph"}
+{"type":"agent_activity","v":1,"verb":"extract","kind":"tool","label":"→ propose use-cases…"}
+{"type":"usage","v":1,"verb":"extract","credits":3.52,"total_credits":7.76}
+{"type":"agent_activity","v":1,"verb":"extract","kind":"decision","label":"putting the result together"}
+{"type":"agent_activity","v":1,"verb":"extract","kind":"tool","label":"✓ propose use-cases"}
+{"type":"commit","v":1,"verb":"extract","source_id":"acceptance-criteria","proposal_id":"20261024T180912-acceptance-criteria","trusted":0,"derived":5,"archived":0,"superseded":0,"assumed":0,"evidence_matched":0,"minted":[{"cid":"sha256:e7ab976cc5b2a9bddbd3b4eb3604c09cfe0d1e8c211281ea5d1d4b850147d646","logical_id":"uc-1"},{"cid":"sha256:790f8f4fc38051c05db0956c7d6e44b171126ddf214beebcd9e7f18c9a6c46e7","logical_id":"uc-2"},{"cid":"sha256:6a6100783fb947ade7d86c40637784f984dcc89e93cb7e33b6a839798b05dc6f","logical_id":"uc-3"},{"cid":"sha256:974735686c9832b4bea0e7b02aa42bafc7dc573ba5815a926138b12e91a88217","logical_id":"uc-4"},{"cid":"sha256:c2202ba027c0c704ad32bef05d05165ad416b3d0e5941db537f215da22f482c9","logical_id":"uc-5"}]}
+{"type":"done","v":1,"verb":"extract","status":"complete","exit_code":0}

@@ -1,0 +1,5 @@
+{"id":"uc-2","cid":"sha256:790f8f4fc38051c05db0956c7d6e44b171126ddf214beebcd9e7f18c9a6c46e7","label":"usecase","title":"Extend a personal limit using group credits","trust":"derived","fresh":"fresh"}
+{"id":"uc-3","cid":"sha256:6a6100783fb947ade7d86c40637784f984dcc89e93cb7e33b6a839798b05dc6f","label":"usecase","title":"Keep a completed extension private","trust":"derived","fresh":"fresh"}
+{"id":"uc-4","cid":"sha256:974735686c9832b4bea0e7b02aa42bafc7dc573ba5815a926138b12e91a88217","label":"usecase","title":"Share a reviewed extension card with the group","trust":"derived","fresh":"fresh"}
+{"id":"uc-1","cid":"sha256:e7ab976cc5b2a9bddbd3b4eb3604c09cfe0d1e8c211281ea5d1d4b850147d646","label":"usecase","title":"Sign in with email and password","trust":"derived","fresh":"fresh"}
+{"id":"uc-5","cid":"sha256:c2202ba027c0c704ad32bef05d05165ad416b3d0e5941db537f215da22f482c9","label":"usecase","title":"View group members and credit balance","trust":"derived","fresh":"fresh"}

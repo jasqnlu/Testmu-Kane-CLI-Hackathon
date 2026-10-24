@@ -1,0 +1,3 @@
+could not open Simulator.app (Unable to find application named 'Simulator'); the device is booted and the run continues headless
+unpacking /Users/jasonlu/Desktop/Testmu-Kane-CLI-Hackathon/Tests/Kane/setup/builds/Weave.zip…
+error: mobile target preparation failed: Could not unpack /Users/jasonlu/Desktop/Testmu-Kane-CLI-Hackathon/Tests/Kane/setup/builds/Weave.zip: unzip:  cannot find or open /Users/jasonlu/Desktop/Testmu-Kane-CLI-Hackathon/Tests/Kane/setup/builds/Weave.zip, /Users/jasonlu/Desktop/Testmu-Kane-CLI-Hackathon/Tests/Kane/setup/builds/Weave.zip.zip or /Users/jasonlu/Desktop/Testmu-Kane-CLI-Hackathon/Tests/Kane/setup/builds/Weave.zip.ZIP.

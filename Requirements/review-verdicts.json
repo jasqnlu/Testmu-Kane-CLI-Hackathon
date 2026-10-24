@@ -1,0 +1,27 @@
+[
+  {
+    "ref": "uc-1",
+    "resolution": "approved",
+    "reason": "Reviewed source citations against AUTH-01, SAFE-01; matches the supplied requirements. Approval authorized by master spec kane-assure step 3."
+  },
+  {
+    "ref": "uc-2",
+    "resolution": "approved",
+    "reason": "Reviewed source citations against CREDIT-01, CREDIT-02, EXT-01, EXT-02, EXT-03, RECOV-01; matches the supplied requirements. Approval authorized by master spec kane-assure step 3."
+  },
+  {
+    "ref": "uc-3",
+    "resolution": "approved",
+    "reason": "Reviewed source citations against PRIV-01; matches the supplied requirements. Approval authorized by master spec kane-assure step 3."
+  },
+  {
+    "ref": "uc-4",
+    "resolution": "approved",
+    "reason": "Reviewed source citations against SHARE-01, SHARE-02, AI-01, AI-02; matches the supplied requirements. Approval authorized by master spec kane-assure step 3."
+  },
+  {
+    "ref": "uc-5",
+    "resolution": "approved",
+    "reason": "Reviewed source citations against GROUP-01; matches the supplied requirements. Approval authorized by master spec kane-assure step 3."
+  }
+]

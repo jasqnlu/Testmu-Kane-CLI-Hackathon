@@ -1,0 +1,2 @@
+{"type":"stream_start","cli_version":"0.9.0","surface":"run","pid":23531,"v":1,"ts":"2026-10-24T18:11:09.511Z"}
+{"type":"recording_state","enabled":true,"session_id":"d098aa41-2332-4dd5-af11-23e4574a836e","persist":true,"session_name":"m0_signin_smoke","test_path":"/Users/jasonlu/Desktop/Testmu-Kane-CLI-Hackathon/.testmuai/tests/m0_signin_smoke_test.md","output_path":"/Users/jasonlu/Desktop/Testmu-Kane-CLI-Hackathon/.testmuai/tests/output-m0_signin_smoke","v":1,"ts":"2026-10-24T18:11:09.517Z"}
