@@ -1,6 +1,6 @@
 # Merge notes for main (Codex)
 
-The `design-system` branch adds `WeaveApp/DesignSystem/`. It changes no file under `Features/`, `Services/`, `Models/`, `Debug/`, `Supabase/`, `Tests/`, `Scripts/`, or `.agents/`. Outside this folder it changes only `Weave.xcodeproj/project.pbxproj` (add-only) and `.gitignore` (one line: `build-design/`). It also adds the app icon in `WeaveApp/DesignSystem/DesignAssets.xcassets` (see **App icon** below).
+The `design-system` branch adds `WeaveApp/DesignSystem/`. It changes no file under `Features/`, `Services/`, `Models/`, `Debug/`, `Supabase/`, `Tests/`, `Scripts/`, or `.agents/`. Outside this folder it changes only `Weave.xcodeproj/project.pbxproj` (add-only), `.gitignore` (one line: `build-design/`), and two new files, `docs/weave-logo.png` and `docs/weave-logo-black.png` (1024 px transparent logo exports for the deck, README, and posts; not in the Xcode project). It also adds the app icon in `WeaveApp/DesignSystem/DesignAssets.xcassets` (see **App icon** below).
 
 Nothing here is wired into a screen yet. When a screen adopts a component, that change is under `WeaveApp/Features/`, so run the kane-verify-loop before you commit it.
 
@@ -72,7 +72,9 @@ The strings below come from `Requirements/acceptance-criteria.md` and the curren
 
 - **`WeaveStyle` vs `WeaveTheme`.** `WeaveStyle` (in `WeaveApp.swift`) still exists, and both compile side by side. Switch a screen to `WeaveTheme` when you touch it. The new palette is darker and bolder, so expect Kane screenshots to change, though not the text.
 - **Exact text.** No component adds, changes, or combines text. `BalanceCard` draws "40 credits" as one `Text` (two runs joined with `+`), so a text query still finds "40 credits".
-- **PrivacyChoice labels.** Each card's accessibility label is exactly its title, and the detail is its value. Tap "Keep Private" or "Share with Group" by text or by identifier.
+- **PrivacyChoice labels.** Each card's accessibility label is exactly its title. Its value is the detail, prefixed with the badge when there is one ("Default. Your reason stays with you…"). The badge and detail are not separate text elements, so assert them through the card's value or identifier, not as standalone text. Tap "Keep Private" or "Share with Group" by text or by identifier.
+- **Confirm sheet.** The text scrolls and the buttons stay pinned to the bottom, so Confirm is always visible. Swipe-to-dismiss is blocked while `isConfirming` is true. At accessibility text sizes the sheet opens at the large detent.
+- **Banners.** Caution and critical `StatusBanner`s post a VoiceOver announcement when they appear. This doesn't change the accessibility tree.
 - **Containers.** `BalanceCard`, `FeedCard`, and `StatusBanner` use `.accessibilityElement(children: .contain)`, so their inner texts stay separate elements.
 - **`LocalConfiguration.swift`.** This worktree has a gitignored placeholder with empty values, for compile checks only. It is not committed, and `Scripts/build-sim.sh` overwrites it.
 
@@ -108,7 +110,7 @@ Give the image an accessibility label equal to the app name, or mark it decorati
 ## Verification done on this branch
 
 - `xcodebuild -scheme Weave -sdk iphonesimulator -configuration Debug -derivedDataPath build-design build`: succeeded, no warnings.
-- All 9 preview samples rendered in light and dark mode on a throwaway simulator that was deleted afterwards. The harness was outside the repo.
+- All 7 preview sample views, plus the Confirming and Share-selected variants, rendered in light and dark mode on a throwaway simulator that was deleted afterwards. The harness was outside the repo.
 - Logo image sets: the build compiles `WeaveLogo` and `WeaveLockup` (light and dark) into `Assets.car`.
 - App icon: the build produces `Assets.car` with AppIcon (default, dark, tinted), and `Info.plist` has `CFBundleIconName = AppIcon`.
 - No Kane runs. Nothing user-facing on a screen changed.

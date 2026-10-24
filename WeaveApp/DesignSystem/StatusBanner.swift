@@ -30,6 +30,16 @@ struct StatusBanner: View {
             }
         }
         .accessibilityElement(children: .contain)
+        .onAppear(perform: announceIfNeeded)
+        .onChange(of: title) { announceIfNeeded() }
+    }
+
+    /// VoiceOver reads caution and critical banners as soon as they appear.
+    /// This does nothing when VoiceOver is off.
+    private func announceIfNeeded() {
+        guard kind == .caution || kind == .critical else { return }
+        let message = [title, detail].compactMap { $0 }.joined(separator: ". ")
+        AccessibilityNotification.Announcement(message).post()
     }
 
     // MARK: Active

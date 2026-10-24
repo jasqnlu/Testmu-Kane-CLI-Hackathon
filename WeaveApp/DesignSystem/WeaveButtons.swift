@@ -96,6 +96,8 @@ struct PrimaryButton: View {
                 if isLoading {
                     ProgressView()
                         .tint(WeaveTheme.Colors.inkInverse)
+                        // Keep the button's label exactly the title text.
+                        .accessibilityHidden(true)
                 }
                 Text(isLoading ? (loadingTitle ?? title) : title)
                     .lineLimit(2)

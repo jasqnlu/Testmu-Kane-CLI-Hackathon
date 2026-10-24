@@ -21,6 +21,30 @@ struct ConfirmSheetStyle: View {
     let onCancel: () -> Void
 
     var body: some View {
+        // The text scrolls and the buttons stay pinned to the bottom, so
+        // Confirm is always on screen, even at the medium detent with large text.
+        ScrollView {
+            content
+                .padding(.horizontal, WeaveTheme.Spacing.lg)
+                .padding(.top, WeaveTheme.Spacing.xl)
+                .padding(.bottom, WeaveTheme.Spacing.md)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .scrollBounceBehavior(.basedOnSize)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            buttons
+                .padding(.horizontal, WeaveTheme.Spacing.lg)
+                .padding(.top, WeaveTheme.Spacing.sm)
+                .padding(.bottom, WeaveTheme.Spacing.md)
+                .background(WeaveTheme.Colors.surface)
+        }
+        .foregroundStyle(WeaveTheme.Colors.ink)
+        .background(WeaveTheme.Colors.surface)
+        // Cancel is disabled while confirming; block swipe-to-dismiss too.
+        .interactiveDismissDisabled(isConfirming)
+    }
+
+    private var content: some View {
         VStack(alignment: .leading, spacing: WeaveTheme.Spacing.md) {
             VStack(alignment: .leading, spacing: WeaveTheme.Spacing.xs) {
                 Text(title)
@@ -42,33 +66,38 @@ struct ConfirmSheetStyle: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .weaveTile(WeaveTheme.Pastel.periwinkle.color, padding: WeaveTheme.Spacing.lg)
                 .weaveIdentifier(summaryIdentifier)
-
-            VStack(spacing: WeaveTheme.Spacing.tileGap) {
-                PrimaryButton(
-                    confirmTitle,
-                    isLoading: isConfirming,
-                    loadingTitle: confirmingTitle,
-                    identifier: confirmIdentifier,
-                    action: onConfirm
-                )
-                SecondaryButton(cancelTitle, identifier: cancelIdentifier, action: onCancel)
-                    .disabled(isConfirming)
-            }
         }
-        .foregroundStyle(WeaveTheme.Colors.ink)
-        .padding(.horizontal, WeaveTheme.Spacing.lg)
-        .padding(.top, WeaveTheme.Spacing.xl)
-        .padding(.bottom, WeaveTheme.Spacing.md)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background(WeaveTheme.Colors.surface)
+    }
+
+    private var buttons: some View {
+        VStack(spacing: WeaveTheme.Spacing.tileGap) {
+            PrimaryButton(
+                confirmTitle,
+                isLoading: isConfirming,
+                loadingTitle: confirmingTitle,
+                identifier: confirmIdentifier,
+                action: onConfirm
+            )
+            SecondaryButton(cancelTitle, identifier: cancelIdentifier, action: onCancel)
+                .disabled(isConfirming)
+        }
     }
 }
 
 extension View {
     /// Medium sheet with 36pt corners, a grabber, and the surface background.
+    /// Opens at the large detent at accessibility text sizes.
     func weaveSheetPresentation() -> some View {
-        self
-            .presentationDetents([.medium, .large])
+        modifier(WeaveSheetPresentation())
+    }
+}
+
+private struct WeaveSheetPresentation: ViewModifier {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    func body(content: Content) -> some View {
+        content
+            .presentationDetents(dynamicTypeSize.isAccessibilitySize ? [.large] : [.medium, .large])
             .presentationDragIndicator(.visible)
             .presentationCornerRadius(WeaveTheme.Radius.sheet)
             .presentationBackground(WeaveTheme.Colors.surface)
@@ -112,5 +141,9 @@ private struct ConfirmSheetSample: View {
 
 #Preview("ConfirmSheet · Confirming") {
     ConfirmSheetSample(isConfirming: true).preferredColorScheme(.dark)
+}
+
+#Preview("ConfirmSheet · Accessibility text") {
+    ConfirmSheetSample().dynamicTypeSize(.accessibility3)
 }
 #endif

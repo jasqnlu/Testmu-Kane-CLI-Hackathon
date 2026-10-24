@@ -14,6 +14,8 @@ struct FeedCard: View {
     /// Set on the body text, for checking the posted text exactly.
     var textIdentifier: String? = nil
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     var body: some View {
         VStack(alignment: .leading, spacing: WeaveTheme.Spacing.sm) {
             HStack(spacing: WeaveTheme.Spacing.sm) {
@@ -40,7 +42,11 @@ struct FeedCard: View {
                 .weaveIdentifier(textIdentifier)
 
             if !tags.isEmpty {
-                HStack(spacing: 6) {
+                // Tags stack vertically at accessibility text sizes.
+                let tagLayout = dynamicTypeSize.isAccessibilitySize
+                    ? AnyLayout(VStackLayout(alignment: .leading, spacing: 6))
+                    : AnyLayout(HStackLayout(spacing: 6))
+                tagLayout {
                     ForEach(Array(tags.enumerated()), id: \.offset) { index, tag in
                         WeaveChip(tag, style: index == 0 ? .dark : .light)
                     }

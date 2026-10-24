@@ -20,6 +20,7 @@ struct PrivacyChoice: View {
     var shareIdentifier: String? = nil
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     /// How far the lower card tucks under the upper one.
     private let overlap: CGFloat = 18
@@ -58,6 +59,10 @@ struct PrivacyChoice: View {
         let isTop = option == .keepPrivate
         let coveredTop = !isTop && !isSelected
         let coveredBottom = isTop && !isSelected
+        // At accessibility text sizes the badge drops below the title.
+        let titleRow = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: WeaveTheme.Spacing.xs))
+            : AnyLayout(HStackLayout(spacing: WeaveTheme.Spacing.xs))
 
         return Button {
             withAnimation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.85)) {
@@ -66,7 +71,7 @@ struct PrivacyChoice: View {
         } label: {
             HStack(alignment: .center, spacing: WeaveTheme.Spacing.sm) {
                 VStack(alignment: .leading, spacing: WeaveTheme.Spacing.xs) {
-                    HStack(spacing: WeaveTheme.Spacing.xs) {
+                    titleRow {
                         Text(title)
                             .weaveFont(.title)
                             .multilineTextAlignment(.leading)
@@ -95,10 +100,12 @@ struct PrivacyChoice: View {
         .buttonStyle(.plain)
         .zIndex(isSelected ? 1 : 0)
         // Keep the label exactly the title so tests can find "Keep Private".
+        // The badge (e.g. "Default") is read first in the value.
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(title)
-        .accessibilityValue(detail)
+        .accessibilityValue(badge.map { "\($0). \(detail)" } ?? detail)
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
+        .accessibilityAction { selection = option }
         .weaveIdentifier(identifier)
     }
 

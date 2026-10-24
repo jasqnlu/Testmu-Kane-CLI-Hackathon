@@ -116,7 +116,7 @@ struct BalanceCard: View {
     }
 
     private var secondaryColor: Color {
-        style == .brand ? WeaveTheme.Colors.onBrand.opacity(0.8) : WeaveTheme.Colors.inkSecondary
+        style == .brand ? WeaveTheme.Colors.onBrand.opacity(0.9) : WeaveTheme.Colors.inkSecondary
     }
 
     private var meterOn: Color {
