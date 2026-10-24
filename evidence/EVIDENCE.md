@@ -16,7 +16,7 @@
 | SHARE-01 | Pending | — | — | Not yet verified |
 | SHARE-02 | [post-alice-s-edited-extension-card-after-review_test.md](../Tests/Kane/ai/post-alice-s-edited-extension-card-after-review_test.md) (related committed flow; direct Kane objective run) | — | [SHARE-02_fallback_post_20261024.evidence](packs/SHARE-02_fallback_post_20261024.evidence) | Kane verified one Alice card with the edited text after explicit Post, with the private reason absent. This used the no-key fallback, not an OpenAI draft. |
 | AI-01 | Share → AI draft → edit → Post (short objective) | — | [AI-01_post_guard_green_20261024.evidence](packs/AI-01_post_guard_green_20261024.evidence) | Passed with source=openai; edited card posted once and private reason absent. |
-| AI-02 | Fresh OpenAI draft privacy samples | — | [AI-02_sample_1_20261024.evidence](packs/AI-02_sample_1_20261024.evidence) | 3/5 sampled so far; see KANE_LOG.md. |
+| AI-02 | Fresh OpenAI draft privacy samples | — | [AI-02_sample_1_20261024.evidence](packs/AI-02_sample_1_20261024.evidence) | 4/5 sampled by the 16:15 cutoff; fifth not run. See KANE_LOG.md and Known limitations. |
 | SAFE-01 | Pending | — | — | Not yet verified |
 
 The full M3 extension regression suite is [M3_extensions_green_20261024.evidence](packs/M3_extensions_green_20261024.evidence) (4/4, 9 criteria).
@@ -32,6 +32,7 @@ Validate selected packs with `kane-cli evidence validate <path>` before indexing
 
 ## What Kane caught
 
+- **M5 AI-02 privacy sample 4/5:** A fourth fresh Kane run returned source=openai and “You used 10 group minutes.”; checked privacy terms were absent. The editor was cancelled without posting. Pack: [AI-02 sample 4](packs/AI-02_sample_4_20261024.evidence).
 - **M5 AI-02 privacy sample 3/5:** A third fresh Kane run returned source=openai and “Nice work this afternoon! You used 10 group minutes and completed a group extension.”; checked privacy terms were absent. The editor was cancelled without posting. Pack: [AI-02 sample 3](packs/AI-02_sample_3_20261024.evidence).
 - **M5 AI-02 privacy sample 2/5:** A second fresh Kane run returned source=openai and “Great work! You used 10 group minutes this afternoon and completed a group extension. Nice achievement!”; checked privacy terms were absent. The editor was cancelled without posting. Pack: [AI-02 sample 2](packs/AI-02_sample_2_20261024.evidence).
 - **M5 AI-02 privacy sample 1/5:** Fresh Kane run returned source=openai and the draft “Nice work this afternoon! You used 10 group minutes and completed a group extension.”; checked privacy terms were absent. The editor was cancelled without posting. Pack: [AI-02 sample 1](packs/AI-02_sample_1_20261024.evidence).
@@ -55,6 +56,8 @@ Validate selected packs with `kane-cli evidence validate <path>` before indexing
 - **M3 extension bughunt:** Kane found no confirmed product defect; the session ended as an agent misstep because it analyzed before tapping Confirm. See [bughunt pack](packs/M3_extension_bughunt_agent_misstep_20261024.evidence).
 
 ## Not verified by Kane
+
+- AI-02 privacy sampling completed **4/5** fresh OpenAI drafts by the 16:15 cutoff; the fifth was not started. See KANE_LOG.md for all four drafts and run IDs.
 
 - Ledger concurrency (CREDIT-01): requires SQL concurrency tests; execution pending.
 - RLS privacy (PRIV-01 database half): one authenticated Bob-versus-Alice reason isolation SQL check passed; wider RLS policy coverage remains limited.
