@@ -17,6 +17,7 @@
 | SHARE-02 | [post-alice-s-edited-extension-card-after-review_test.md](../Tests/Kane/ai/post-alice-s-edited-extension-card-after-review_test.md) (related committed flow; direct Kane objective run) | — | [SHARE-02_fallback_post_20261024.evidence](packs/SHARE-02_fallback_post_20261024.evidence) | Kane verified one Alice card with the edited text after explicit Post, with the private reason absent. This used the no-key fallback, not an OpenAI draft. |
 | AI-01 | Share → AI draft → edit → Post (short objective) | — | [AI-01_post_guard_green_20261024.evidence](packs/AI-01_post_guard_green_20261024.evidence) | Passed with source=openai; edited card posted once and private reason absent. |
 | AI-02 | Fresh OpenAI draft privacy samples | — | [AI-02_sample_1_20261024.evidence](packs/AI-02_sample_1_20261024.evidence) | 4/5 sampled by the 16:15 cutoff; fifth not run. See KANE_LOG.md and Known limitations. |
+| M6 Journey | Kane live full-flow objective | — | [journey_final.evidence](packs/journey_final.evidence) | Passed the complete extension → OpenAI draft → edit → Post journey. A subsequent replay-author attempt was blocked by Alice’s already-used daily extension allowance; see [diagnostic](packs/journey_replay_test_data_misstep.evidence), a test-data issue. |
 | SAFE-01 | Pending | — | — | Not yet verified |
 
 The full M3 extension regression suite is [M3_extensions_green_20261024.evidence](packs/M3_extensions_green_20261024.evidence) (4/4, 9 criteria).
@@ -31,6 +32,9 @@ The full M3 extension regression suite is [M3_extensions_green_20261024.evidence
 Validate selected packs with `kane-cli evidence validate <path>` before indexing them. View a saved pack locally with `kane-cli evidence serve evidence/packs/<file>`.
 
 ## What Kane caught
+
+- **M6 full journey:** live Kane objective passed in session `973b435b-d578-4c27-9a85-ecd78f4245b7` (run-0, exit 0), pack [journey_final.evidence](packs/journey_final.evidence).
+- **M6 replay test-data issue:** generated replay session `05fc7399-9698-4b55-8972-89c5e28eec68` attempted a second daily extension on Alice after the live journey had already used her allowance. Backend correctly declined; no product defect. See [journey replay diagnostic](packs/journey_replay_test_data_misstep.evidence).
 
 - **M5 AI-02 privacy sample 4/5:** A fourth fresh Kane run returned source=openai and “You used 10 group minutes.”; checked privacy terms were absent. The editor was cancelled without posting. Pack: [AI-02 sample 4](packs/AI-02_sample_4_20261024.evidence).
 - **M5 AI-02 privacy sample 3/5:** A third fresh Kane run returned source=openai and “Nice work this afternoon! You used 10 group minutes and completed a group extension.”; checked privacy terms were absent. The editor was cancelled without posting. Pack: [AI-02 sample 3](packs/AI-02_sample_3_20261024.evidence).
