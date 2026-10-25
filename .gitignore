@@ -34,8 +34,9 @@ Config/Backend.json
 Config/TestAccounts.json
 WeaveApp/Services/LocalConfiguration.swift
 
-# Generated local Supabase/app configuration (never commit test credentials)
-Config/
+# Local Supabase configuration and demo account credentials stay private.
+Config/*
+!Config/Backend.demo.json
 
 # Python helper bytecode
 __pycache__/

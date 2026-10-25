@@ -1,3 +1,43 @@
+# Judge quickstart
+
+Can’t run it? Watch the demo: [VIDEO_LINK]
+
+**Requirements:** Apple Silicon Mac; Xcode with an iPhone simulator.
+
+**Setup**
+
+1. Clone the repository and enter its folder:
+
+   ```sh
+   git clone https://github.com/jasqnlu/Testmu-Kane-CLI-Hackathon.git
+   cd Testmu-Kane-CLI-Hackathon
+   ```
+
+2. Before each demo, reset the fixture with `./Scripts/seed.sh normal`. This CLI seeder requires an authorized Supabase CLI login plus local `Config/Backend.json` and `Config/TestAccounts.json`; those files and credentials are not included in the clone. If you do not have that setup, launch the app, sign in as Alice, then tap **Debug → Seed: normal**. That authenticated in-app option restores Study to 40 credits and clears extension records, without the CLI.
+
+3. Build, install, and launch Weave in the simulator:
+
+   ```sh
+   ./Scripts/run-demo.sh
+   ```
+
+**Six-step demo path**
+
+1. Sign in as Alice using the demo login from the submission form.
+2. Tap **Debug → Set usage at limit**, then **Group → Request 10 minutes**.
+3. Tap **Confirm** (balance: 40 → 30), then **Choose how to share → Keep Private**.
+4. Sign out. Sign in as Charlie using the submission form, then request 10 minutes. If the limit prompt is not visible, tap **Debug → Set usage at limit** and return to **Group**.
+5. Tap **Confirm** (balance: 30 → 20), then **Choose how to share → Share with Group**. Edit the OpenAI draft and tap **Post**.
+6. Sign out and sign in as Bob. The Group screen shows 20 credits and Charlie’s card; Alice’s private activity is absent.
+
+**Demo logins:** provided in the submission form. Passwords are not stored in this repository.
+
+**Optional Kane verification:** `./Scripts/verify.sh smoke` (requires a Kane login). Kane is not needed to launch the demo.
+
+**Known limitations:** Simulator Screen Time uses a mock provider; ledger concurrency and RLS are checked with SQL, not Kane; AI privacy was sampled 4/5; requirement coverage is 21/46.
+
+---
+
 # Weave
 
 Study groups try to keep each other off their phones, but limits are solitary and asking for more time means explaining yourself. Weave gives the group a shared time budget: going over costs everyone a little, and your reason stays private unless you choose to share.

@@ -13,10 +13,12 @@ from urllib.parse import urlparse
 
 root = pathlib.Path.cwd()
 backend_path = root / "Config/Backend.json"
+if not backend_path.is_file():
+    backend_path = root / "Config/Backend.demo.json"
 accounts_path = root / "Config/TestAccounts.json"
 output = root / "WeaveApp/Services/LocalConfiguration.swift"
 if not backend_path.is_file():
-    sys.exit("Missing Config/Backend.json. Configure the Supabase project before building; see README.md.")
+    sys.exit("Missing Config/Backend.json and committed Config/Backend.demo.json. See README.md.")
 try:
     backend = json.loads(backend_path.read_text())
     base_url = backend["url"]
@@ -25,16 +27,16 @@ try:
     if parsed.scheme != "https" or not parsed.hostname or not isinstance(anon_key, str) or not anon_key:
         raise ValueError()
     if anon_key.startswith("sb_secret_"):
-        sys.exit("Config/Backend.json must use a public anon/publishable key, never a secret/service-role key.")
+        sys.exit("Backend configuration must use a public anon/publishable key, never a secret/service-role key.")
     # Legacy Supabase JWT keys encode their role in the payload.
     if anon_key.count(".") == 2:
         import base64
         payload = anon_key.split(".")[1]
         claims = json.loads(base64.urlsafe_b64decode(payload + "=" * (-len(payload) % 4)))
         if claims.get("role") != "anon":
-            sys.exit("Config/Backend.json JWT must have role anon; service-role keys cannot be embedded in the app.")
+            sys.exit("Backend configuration JWT must have role anon; service-role keys cannot be embedded in the app.")
 except (KeyError, ValueError, TypeError):
-    sys.exit("Config/Backend.json must contain a valid HTTPS url and public anonKey.")
+    sys.exit("Backend configuration must contain a valid HTTPS URL and public anonKey.")
 
 # JSON string escaping also escapes backslashes, preventing Swift interpolation.
 def swift_string(value):
