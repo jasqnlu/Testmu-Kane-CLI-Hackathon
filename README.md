@@ -1,6 +1,6 @@
 # Judge quickstart
 
-Can’t run it? Watch the demo: [VIDEO_LINK]
+Can’t run it? [Watch the demo](https://youtu.be/1_yclkEaxb8).
 
 **Requirements:** Apple Silicon Mac; Xcode with an iPhone simulator.
 
